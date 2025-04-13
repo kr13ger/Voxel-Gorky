@@ -109,7 +109,8 @@ func _apply_damage(target: Node3D) -> void:
 	
 	# Try to find HealthComponent in the target
 	if target.has_method("get_component"):
-		health_component = target.get_component(HealthComponent)
+		var health_component_script = load("res://scripts/components/HealthComponent.gd")
+		health_component = target.get_component(health_component_script)
 	else:
 		# Look for HealthComponent in children
 		for child in target.get_children():
