@@ -32,13 +32,13 @@ func _on_physics_process(delta: float) -> void:
 	# Virtual method to be overridden by child components
 	pass
 
-func get_component(component_type) -> Node:
+func get_component(component_type: GDScript) -> Node:
 	if not _is_initialized or not owner_entity:
 		Logger.error("Cannot get component: Component not initialized", "Component")
 		return null
 		
 	for child in owner_entity.get_children():
-		if child is component_type:
+		if child.get_script() == component_type:
 			return child
 	
 	Logger.warning("Component not found: %s" % component_type, "Component")

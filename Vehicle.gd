@@ -74,9 +74,9 @@ func _initialize_state_machine() -> void:
 		
 		Logger.info("Vehicle state machine initialized", "Vehicle")
 
-func get_component(component_type) -> Component:
+func get_component(component_type: GDScript) -> Component:
 	for component in _components:
-		if component is component_type:
+		if component.get_script() == component_type:
 			return component
 	return null
 

@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Voxel Gorky"
+run/main_scene="uid://dyc2g7ysxu68k"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 

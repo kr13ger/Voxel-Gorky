@@ -5,14 +5,16 @@ var _physics_component: VehiclePhysicsComponent = null
 
 func enter() -> void:
 	if owner_node is Vehicle:
-		_physics_component = owner_node.get_component(VehiclePhysicsComponent)
+		var physics_component_script = load("res://scripts/components/VehiclePhysicsComponent.gd")
+		_physics_component = owner_node.get_component(physics_component_script)
 	
 	Logger.debug("Vehicle entered Moving state", "VehicleMovingState")
 
 func handle_input(event: InputEvent) -> void:
 	# Still handle firing while moving
 	if Input.is_action_just_pressed("fire") and owner_node is Vehicle:
-		var weapon_component = owner_node.get_component(WeaponComponent)
+		var weapon_component_script = load("res://scripts/components/WeaponComponent.gd")
+		var weapon_component = owner_node.get_component(weapon_component_script)
 		if weapon_component:
 			weapon_component.fire()
 
