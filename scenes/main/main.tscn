@@ -1,0 +1,65 @@
+[gd_scene load_steps=10 format=3 uid="uid://dyc2g7ysxu68k"]
+
+[ext_resource type="Script" uid="uid://qe5bdy37oci0" path="res://Vehicle.gd" id="1_k2fmo"]
+[ext_resource type="Script" uid="uid://dplcyiiy76lqm" path="res://scripts/resources/ProjectilePoolManager.gd" id="2_l3cfh"]
+[ext_resource type="Script" uid="uid://cor2drr88ac5k" path="res://scripts/components/HealthComponent.gd" id="2_ow5a4"]
+[ext_resource type="Script" uid="uid://dbbfpfqt4sode" path="res://ui/UI.gd" id="3_6q06x"]
+[ext_resource type="Script" uid="uid://brfrrnhp0r6it" path="res://scripts/components/WeaponComponent.gd" id="3_hujxm"]
+[ext_resource type="Script" uid="uid://cpsmaui3420jw" path="res://scripts/components/VehiclePhysicsComponent.gd" id="4_yyfjg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b1x3f"]
+albedo_color = Color(4.81308e-06, 0.381852, 0.0321263, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_a8run"]
+material = SubResource("StandardMaterial3D_b1x3f")
+size = Vector3(1, 0.5, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ouso4"]
+size = Vector3(1, 0.5, 2)
+
+[node name="Main" type="Node3D"]
+
+[node name="PlayerVehicle" type="CharacterBody3D" parent="."]
+script = ExtResource("1_k2fmo")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlayerVehicle"]
+mesh = SubResource("BoxMesh_a8run")
+
+[node name="HealthComponent" type="Node" parent="PlayerVehicle"]
+script = ExtResource("2_ow5a4")
+
+[node name="WeaponComponent" type="Node" parent="PlayerVehicle"]
+script = ExtResource("3_hujxm")
+
+[node name="FirePoint" type="Node3D" parent="PlayerVehicle/WeaponComponent"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.02694)
+
+[node name="PhysicsComponent" type="Node" parent="PlayerVehicle"]
+script = ExtResource("4_yyfjg")
+
+[node name="StateMachine" type="Node" parent="PlayerVehicle"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerVehicle"]
+shape = SubResource("BoxShape3D_ouso4")
+
+[node name="Environment" type="Node3D" parent="."]
+
+[node name="ProjectilePoolManager" type="Node" parent="."]
+script = ExtResource("2_l3cfh")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("3_6q06x")
+
+[node name="AmmoCounter" type="Label" parent="UI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="HealthBar" type="ProgressBar" parent="UI"]
+layout_mode = 0
+offset_right = 4.0
+offset_bottom = 27.0
