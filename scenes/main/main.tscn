@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3 uid="uid://dyc2g7ysxu68k"]
 
-[ext_resource type="Script" uid="uid://qe5bdy37oci0" path="res://Vehicle.gd" id="1_k2fmo"]
+[ext_resource type="Script" uid="uid://qe5bdy37oci0" path="res://scripts/Vehicle.gd" id="1_k2fmo"]
 [ext_resource type="Script" uid="uid://dplcyiiy76lqm" path="res://scripts/resources/ProjectilePoolManager.gd" id="2_l3cfh"]
 [ext_resource type="Script" uid="uid://cor2drr88ac5k" path="res://scripts/components/HealthComponent.gd" id="2_ow5a4"]
 [ext_resource type="Script" uid="uid://dbbfpfqt4sode" path="res://ui/UI.gd" id="3_6q06x"]
