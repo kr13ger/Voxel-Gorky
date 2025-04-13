@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dyc2g7ysxu68k"]
+[gd_scene load_steps=12 format=3 uid="uid://dyc2g7ysxu68k"]
 
 [ext_resource type="Script" uid="uid://bhb8clpeuw2p1" path="res://scenes/main/MainScene.gd" id="1_hujxm"]
 [ext_resource type="Script" uid="uid://qe5bdy37oci0" path="res://scripts/Vehicle.gd" id="1_k2fmo"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://dbbfpfqt4sode" path="res://ui/UI.gd" id="3_6q06x"]
 [ext_resource type="Script" uid="uid://brfrrnhp0r6it" path="res://scripts/components/WeaponComponent.gd" id="3_hujxm"]
 [ext_resource type="Script" uid="uid://cpsmaui3420jw" path="res://scripts/components/VehiclePhysicsComponent.gd" id="4_yyfjg"]
+[ext_resource type="Script" uid="uid://dkdowb7tw2elb" path="res://scripts/states/StateMachine.gd" id="6_yyfjg"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b1x3f"]
 albedo_color = Color(4.81308e-06, 0.381852, 0.0321263, 1)
@@ -40,6 +41,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.02694)
 script = ExtResource("4_yyfjg")
 
 [node name="StateMachine" type="Node" parent="PlayerVehicle"]
+script = ExtResource("6_yyfjg")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerVehicle"]
 shape = SubResource("BoxShape3D_ouso4")
@@ -62,17 +64,25 @@ script = ExtResource("2_l3cfh")
 
 [node name="UI" type="Control" parent="."]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("3_6q06x")
 
 [node name="AmmoCounter" type="Label" parent="UI"]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 200.0
+offset_bottom = 43.0
+text = "Ammo: 30 / 30"
 
 [node name="HealthBar" type="ProgressBar" parent="UI"]
 layout_mode = 0
-offset_right = 4.0
-offset_bottom = 27.0
+offset_left = 20.0
+offset_top = 50.0
+offset_right = 220.0
+offset_bottom = 77.0
+value = 100.0

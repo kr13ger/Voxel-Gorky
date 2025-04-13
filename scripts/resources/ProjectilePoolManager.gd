@@ -3,6 +3,7 @@ class_name ProjectilePoolManager
 
 var _projectile_pools: Dictionary = {}
 var _default_pool_size: int = 10
+var _projectile_scene = preload("res://scripts/Projectile.gd")
 
 func _ready() -> void:
 	SignalBus.vehicle_fired.connect(_on_vehicle_fired)
@@ -15,16 +16,20 @@ func initialize_pool(projectile_type: String, pool_size: int = -1) -> void:
 	var size = pool_size if pool_size > 0 else _default_pool_size
 	var projectile_data = ItemDatabase.get_projectile_data(projectile_type)
 	
-	if projectile_data.empty() or not projectile_data.has("model_path"):
+	if projectile_data.is_empty():
 		Logger.error("Failed to initialize pool: Invalid projectile type", "ProjectilePoolManager")
 		return
 	
-	var model_path = projectile_data.model_path
-	var prefab = load(model_path)
+	var prefab = null
 	
+	# Try to load the specified model
+	if projectile_data.has("model_path") and ResourceLoader.exists(projectile_data.model_path):
+		prefab = load(projectile_data.model_path)
+	
+	# If no model is available, create a generic projectile
 	if not prefab:
-		Logger.error("Failed to load projectile prefab: %s" % model_path, "ProjectilePoolManager")
-		return
+		Logger.warning("Failed to load projectile prefab: %s. Using generic projectile." % projectile_data.get("model_path", "NONE"), "ProjectilePoolManager")
+		prefab = _create_generic_projectile_prefab(projectile_type)
 	
 	var pool = ObjectPool.new(prefab, size)
 	add_child(pool)
@@ -74,3 +79,43 @@ func _on_vehicle_fired(projectile_data: Dictionary) -> void:
 	
 	if projectile is Projectile:
 		projectile.initialize(projectile_type, position, direction, owner)
+
+# Creates a generic projectile prefab to use when the specified model can't be loaded
+func _create_generic_projectile_prefab(projectile_type: String) -> PackedScene:
+	var scene = PackedScene.new()
+	var projectile = Area3D.new()
+	
+	# Add projectile script
+	projectile.set_script(_projectile_scene)
+	
+	# Create collision shape
+	var collision_shape = CollisionShape3D.new()
+	var sphere_shape = SphereShape3D.new()
+	sphere_shape.radius = 0.2
+	collision_shape.shape = sphere_shape
+	projectile.add_child(collision_shape)
+	
+	# Add a simple mesh
+	var mesh_instance = MeshInstance3D.new()
+	var sphere_mesh = SphereMesh.new()
+	sphere_mesh.radius = 0.2
+	sphere_mesh.height = 0.4
+	mesh_instance.mesh = sphere_mesh
+	
+	# Apply material to identify projectile type
+	var material = StandardMaterial3D.new()
+	if projectile_type == "explosive_shell":
+		material.albedo_color = Color(1.0, 0.2, 0.2) # Red for explosive
+	else:
+		material.albedo_color = Color(0.7, 0.7, 0.9) # Blue-ish for standard
+	
+	mesh_instance.material_override = material
+	projectile.add_child(mesh_instance)
+	
+	# Pack the scene
+	var result = scene.pack(projectile)
+	if result == OK:
+		return scene
+	else:
+		Logger.error("Failed to pack generic projectile scene", "ProjectilePoolManager")
+		return null

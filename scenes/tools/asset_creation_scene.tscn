@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dhao4a58qui5j"]
+
+[ext_resource type="Script" uid="uid://b4lmxrxlbeu55" path="res://scripts/tools/AssetCreationScript.gd" id="1_p1gur"]
+
+[node name="AssetCreationScene" type="Node"]
+script = ExtResource("1_p1gur")

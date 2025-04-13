@@ -85,10 +85,8 @@ func _create_ground() -> void:
 	var ground_material = StandardMaterial3D.new()
 	ground_material.albedo_color = Color(0.2, 0.5, 0.2)
 	
-	# Add a grid texture
-	var checker = ImageTexture.new()
-	var img = Image.new()
-	img.create(64, 64, false, Image.FORMAT_RGB8)
+	# Create a texture with proper size first
+	var img = Image.create(64, 64, false, Image.FORMAT_RGB8)
 	img.fill(Color(0.2, 0.5, 0.2))
 	
 	# Draw grid lines
@@ -98,7 +96,7 @@ func _create_ground() -> void:
 				img.set_pixel(i, j, Color(0.1, 0.3, 0.1))
 				img.set_pixel(j, i, Color(0.1, 0.3, 0.1))
 	
-	checker = ImageTexture.create_from_image(img)
+	var checker = ImageTexture.create_from_image(img)
 	ground_material.albedo_texture = checker
 	ground_material.uv1_scale = Vector3(environment_size.x, environment_size.z, 1)
 	ground.material_override = ground_material

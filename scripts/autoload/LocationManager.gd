@@ -81,7 +81,7 @@ func _grid_pos_to_key(grid_pos: Vector3i) -> String:
 func _create_voxel_instance(grid_pos: Vector3i, voxel_data: Dictionary) -> void:
 	var block_data = ItemDatabase.get_block_data(voxel_data.type)
 	
-	if block_data.empty():
+	if block_data.is_empty():
 		Logger.error("Failed to create voxel: Block type not found", "LocationManager")
 		return
 	
@@ -97,20 +97,26 @@ func _create_voxel_instance(grid_pos: Vector3i, voxel_data: Dictionary) -> void:
 	# Set material/texture
 	var material = StandardMaterial3D.new()
 	if block_data.has("texture_path"):
-		var texture = load(block_data.texture_path)
-		if texture:
-			material.albedo_texture = texture
+		var texture_path = block_data.texture_path
+		# Check if the texture file exists first
+		if ResourceLoader.exists(texture_path):
+			var texture = load(texture_path)
+			if texture:
+				material.albedo_texture = texture
+		else:
+			Logger.warning("Texture not found: %s, using color instead" % texture_path, "LocationManager")
 	
-	# Set color based on type if no texture
-	match voxel_data.type:
-		"dirt":
-			material.albedo_color = Color(0.5, 0.35, 0.05)
-		"stone":
-			material.albedo_color = Color(0.7, 0.7, 0.7)
-		"metal":
-			material.albedo_color = Color(0.6, 0.6, 0.8)
-		_:
-			material.albedo_color = Color(1, 1, 1)
+	# Set color based on type if no texture or texture failed to load
+	if not material.albedo_texture:
+		match voxel_data.type:
+			"dirt":
+				material.albedo_color = Color(0.5, 0.35, 0.05)
+			"stone":
+				material.albedo_color = Color(0.7, 0.7, 0.7)
+			"metal":
+				material.albedo_color = Color(0.6, 0.6, 0.8)
+			_:
+				material.albedo_color = Color(1, 1, 1)
 	
 	mesh_instance.material_override = material
 	
