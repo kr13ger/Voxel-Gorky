@@ -6,29 +6,41 @@ var _physics_component: VehiclePhysicsComponent = null
 func enter() -> void:
 	print("VehicleMovingState: Entered")
 	if owner_node is Vehicle:
-		var physics_component_script = load("res://scripts/components/VehiclePhysicsComponent.gd")
-		_physics_component = owner_node.get_component(physics_component_script)
+		# Get physics component directly instead of loading script
+		_physics_component = owner_node.get_component(VehiclePhysicsComponent)
 		if _physics_component:
-			print("VehicleMovingState: Got physics component")
+			print("VehicleMovingState: Got physics component successfully")
+			# Immediately apply initial input to start moving
+			_handle_movement_input() 
 		else:
-			print("VehicleMovingState: Failed to get physics component")
+			print("VehicleMovingState: FAILED to get physics component")
+			# Try alternative method by direct node reference
+			if owner_node.has_node("PhysicsComponent"):
+				var phys = owner_node.get_node("PhysicsComponent")
+				if phys is VehiclePhysicsComponent:
+					_physics_component = phys
+					print("VehicleMovingState: Retrieved physics component via direct node reference")
+					_handle_movement_input()
 	
 	Logger.debug("Vehicle entered Moving state", "VehicleMovingState")
 
 func handle_input(event: InputEvent) -> String:
-	# Still handle firing while moving
-	if Input.is_action_just_pressed("fire") and owner_node is Vehicle:
-		var weapon_component_script = load("res://scripts/components/WeaponComponent.gd")
-		var weapon_component = owner_node.get_component(weapon_component_script)
+	# Handle firing while moving
+	if event.is_action_pressed("fire") and owner_node is Vehicle:
+		var weapon_component = owner_node.get_component(WeaponComponent)
 		if weapon_component:
 			weapon_component.fire()
 	
-	if not Input.is_action_pressed("move_forward") and \
-	   not Input.is_action_pressed("move_backward") and \
-	   not Input.is_action_pressed("turn_left") and \
-	   not Input.is_action_pressed("turn_right"):
-		print("VehicleMovingState: No movement detected, returning to Idle")
-		return "Idle"
+	# Check for movement input release to transition to idle
+	if event.is_action_released("move_forward") or event.is_action_released("move_backward") or \
+	   event.is_action_released("turn_left") or event.is_action_released("turn_right"):
+		# Only return to idle if no movement keys are pressed
+		if not Input.is_action_pressed("move_forward") and \
+		   not Input.is_action_pressed("move_backward") and \
+		   not Input.is_action_pressed("turn_left") and \
+		   not Input.is_action_pressed("turn_right"):
+			print("VehicleMovingState: No movement detected, returning to Idle")
+			return "Idle"
 	
 	return ""
 
@@ -41,6 +53,7 @@ func physics_update(delta: float) -> void:
 
 func _handle_movement_input() -> void:
 	if not _physics_component:
+		print("VehicleMovingState: No physics component available")
 		return
 	
 	var input_vector = Vector2.ZERO
@@ -65,6 +78,7 @@ func _handle_movement_input() -> void:
 	
 	# Apply to physics component
 	_physics_component.set_movement_input(input_vector)
+	print("Applied input vector: ", input_vector)
 
 func get_transition() -> String:
 	# Check if we should transition to Idle state

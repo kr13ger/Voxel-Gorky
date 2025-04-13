@@ -43,7 +43,7 @@ func fire() -> bool:
 	
 	var projectile_data = ItemDatabase.get_projectile_data(projectile_type)
 	
-	if projectile_data.empty():
+	if projectile_data.is_empty():
 		Logger.error("Failed to fire: Projectile type not found", "WeaponComponent")
 		return false
 	

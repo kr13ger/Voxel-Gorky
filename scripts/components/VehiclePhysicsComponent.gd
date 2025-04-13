@@ -10,8 +10,16 @@ class_name VehiclePhysicsComponent
 var velocity: Vector3 = Vector3.ZERO
 var _movement_input: Vector2 = Vector2.ZERO
 var _ground_check_ray_length: float = 0.6
+var debug_mode: bool = true
+
+func _on_initialize() -> void:
+	print("VehiclePhysicsComponent initialized")
+	Logger.debug("VehiclePhysicsComponent initialized with max speed: " + str(max_speed), "VehiclePhysicsComponent")
 
 func _on_physics_process(delta: float) -> void:
+	if debug_mode and _movement_input != Vector2.ZERO:
+		print("Physics processing with input: ", _movement_input)
+		
 	# Apply movement based on input
 	_apply_movement(delta)
 	
@@ -26,10 +34,15 @@ func _on_physics_process(delta: float) -> void:
 		owner_entity.velocity = velocity
 		owner_entity.move_and_slide()
 		velocity = owner_entity.velocity
+		
+		if debug_mode and _movement_input != Vector2.ZERO:
+			print("Applied velocity: ", velocity)
 	else:
 		Logger.error("VehiclePhysicsComponent requires a CharacterBody3D parent", "VehiclePhysicsComponent")
 
 func set_movement_input(input: Vector2) -> void:
+	if debug_mode and input != _movement_input:
+		print("Movement input changed from ", _movement_input, " to ", input)
 	_movement_input = input
 
 func _apply_movement(delta: float) -> void:
@@ -41,6 +54,8 @@ func _apply_movement(delta: float) -> void:
 	# Rotation (left/right)
 	if _movement_input.x != 0:
 		owner_entity.rotate_y(-_movement_input.x * turn_speed * delta)
+		if debug_mode:
+			print("Rotating vehicle by: ", -_movement_input.x * turn_speed * delta)
 	
 	# Convert direction to global space
 	direction = owner_entity.global_transform.basis * direction
@@ -53,8 +68,12 @@ func _apply_movement(delta: float) -> void:
 	
 	if direction.length() > 0:
 		horizontal_velocity = horizontal_velocity.move_toward(target_velocity, acceleration * delta)
+		if debug_mode:
+			print("Accelerating to target: ", target_velocity)
 	else:
 		horizontal_velocity = horizontal_velocity.move_toward(Vector3.ZERO, deceleration * delta)
+		if debug_mode and horizontal_velocity.length() > 0.1:
+			print("Decelerating, current velocity: ", horizontal_velocity)
 	
 	# Update velocity
 	velocity.x = horizontal_velocity.x

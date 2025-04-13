@@ -44,7 +44,7 @@ func initialize(p_type: String, position: Vector3, direction: Vector3, p_owner: 
 	# Load projectile data
 	var projectile_data = ItemDatabase.get_projectile_data(projectile_type)
 	
-	if not projectile_data.empty():
+	if not projectile_data.is_empty():
 		speed = projectile_data.get("speed", speed)
 		damage = projectile_data.get("damage", damage)
 		explosive = projectile_data.get("explosive", explosive)

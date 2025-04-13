@@ -3,11 +3,11 @@ class_name Vehicle
 
 @export var vehicle_type: String = "main_tank"
 @export_group("Components")
-@export var health_component_path: NodePath
-@export var weapon_component_path: NodePath
-@export var physics_component_path: NodePath
+@export var health_component_path: NodePath = "HealthComponent"  # Default path
+@export var weapon_component_path: NodePath = "WeaponComponent"  # Default path
+@export var physics_component_path: NodePath = "PhysicsComponent"  # Default path
 @export_group("State Machine")
-@export var state_machine_path: NodePath
+@export var state_machine_path: NodePath = "StateMachine"  # Default path
 
 var _health_component: HealthComponent
 var _weapon_component: WeaponComponent
@@ -18,11 +18,13 @@ var _components: Array[Component] = []
 
 func _ready() -> void:
 	print("Vehicle _ready called")
-	_initialize_components()
-	_initialize_state_machine()
 	
 	# Setup input actions if they don't exist
 	_setup_input_actions()
+	
+	# Initialize components and state machine
+	_initialize_components()
+	_initialize_state_machine()
 	
 	# Register with GameManager if this is the player vehicle
 	if name == "PlayerVehicle":
@@ -31,31 +33,41 @@ func _ready() -> void:
 
 func _initialize_components() -> void:
 	print("Initializing components...")
-	# Get components from paths
+	# Get components from paths - with additional error checking
 	if not health_component_path.is_empty():
-		_health_component = get_node(health_component_path)
-		_components.append(_health_component)
-		print("Health component found at path: ", health_component_path)
+		if has_node(health_component_path):
+			_health_component = get_node(health_component_path)
+			_components.append(_health_component)
+			print("Health component found at path: ", health_component_path)
+		else:
+			print("WARNING: Health component path is valid but node not found at: ", health_component_path)
 	else:
 		print("Health component path is empty")
 	
 	if not weapon_component_path.is_empty():
-		_weapon_component = get_node(weapon_component_path)
-		_components.append(_weapon_component)
-		print("Weapon component found at path: ", weapon_component_path)
+		if has_node(weapon_component_path):
+			_weapon_component = get_node(weapon_component_path)
+			_components.append(_weapon_component)
+			print("Weapon component found at path: ", weapon_component_path)
+		else:
+			print("WARNING: Weapon component path is valid but node not found at: ", weapon_component_path)
 	else:
 		print("Weapon component path is empty")
 	
 	if not physics_component_path.is_empty():
-		_physics_component = get_node(physics_component_path)
-		_components.append(_physics_component)
-		print("Physics component found at path: ", physics_component_path)
+		if has_node(physics_component_path):
+			_physics_component = get_node(physics_component_path)
+			_components.append(_physics_component)
+			print("Physics component found at path: ", physics_component_path)
+		else:
+			print("WARNING: Physics component path is valid but node not found at: ", physics_component_path)
 	else:
 		print("Physics component path is empty")
 	
 	# Initialize all components
 	for component in _components:
 		component.initialize(self)
+		print("Initialized component: ", component.name)
 	
 	# Setup destroyed signal
 	if _health_component:
@@ -66,30 +78,33 @@ func _initialize_components() -> void:
 func _initialize_state_machine() -> void:
 	print("Initializing state machine...")
 	if not state_machine_path.is_empty():
-		_state_machine = get_node(state_machine_path)
-		if _state_machine:
-			_state_machine.initialize(self)
-			
-			# Add states
-			var idle_state = VehicleIdleState.new()
-			idle_state.name = "Idle"
-			_state_machine.add_state("Idle", idle_state)
-			
-			var moving_state = VehicleMovingState.new()
-			moving_state.name = "Moving"
-			_state_machine.add_state("Moving", moving_state)
-			
-			var destroyed_state = VehicleDestroyedState.new()
-			destroyed_state.name = "Destroyed"
-			_state_machine.add_state("Destroyed", destroyed_state)
-			
-			# Set initial state
-			_state_machine.change_state("Idle")
-			
-			Logger.info("Vehicle state machine initialized", "Vehicle")
-			print("State machine initialized successfully")
+		if has_node(state_machine_path):
+			_state_machine = get_node(state_machine_path)
+			if _state_machine:
+				_state_machine.initialize(self)
+				
+				# Add states
+				var idle_state = VehicleIdleState.new()
+				idle_state.name = "Idle"
+				_state_machine.add_state("Idle", idle_state)
+				
+				var moving_state = VehicleMovingState.new()
+				moving_state.name = "Moving"
+				_state_machine.add_state("Moving", moving_state)
+				
+				var destroyed_state = VehicleDestroyedState.new()
+				destroyed_state.name = "Destroyed"
+				_state_machine.add_state("Destroyed", destroyed_state)
+				
+				# Set initial state
+				_state_machine.change_state("Idle")
+				
+				Logger.info("Vehicle state machine initialized", "Vehicle")
+				print("State machine initialized successfully")
+			else:
+				print("ERROR: State machine node not found at path: ", state_machine_path)
 		else:
-			print("ERROR: State machine node not found at path: ", state_machine_path)
+			print("ERROR: State machine path is valid but node not found at: ", state_machine_path)
 	else:
 		print("ERROR: State machine path is empty")
 
@@ -149,15 +164,6 @@ func _setup_input_actions() -> void:
 	print("Input actions setup completed")
 
 func _input(event: InputEvent) -> void:
-	# Debug input events
-	if event is InputEventKey:
-		if event.pressed:
-			print("Key pressed: ", event.keycode)
-			if event.keycode == KEY_W:
-				print("W key pressed")
-			elif event.keycode == KEY_S: 
-				print("S key pressed")
-			elif event.keycode == KEY_A:
-				print("A key pressed")
-			elif event.keycode == KEY_D:
-				print("D key pressed")
+	# Forward input events to state machine
+	if _state_machine and _state_machine.current_state:
+		_state_machine.current_state.handle_input(event)

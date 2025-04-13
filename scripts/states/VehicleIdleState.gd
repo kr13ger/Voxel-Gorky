@@ -4,35 +4,37 @@ class_name VehicleIdleState
 func enter() -> void:
 	print("VehicleIdleState: Entered")
 	if owner_node is Vehicle:
-		var physics_component_script = load("res://scripts/components/VehiclePhysicsComponent.gd")
-		var physics_component = owner_node.get_component(physics_component_script)
+		var physics_component = owner_node.get_component(VehiclePhysicsComponent)
 		if physics_component:
 			physics_component.set_movement_input(Vector2.ZERO)
+			print("VehicleIdleState: Reset movement input to zero")
+		else:
+			print("VehicleIdleState: Could not find physics component")
 	
 	Logger.debug("Vehicle entered Idle state", "VehicleIdleState")
 
 func handle_input(event: InputEvent) -> String:
-	# Check for movement inputs
-	if Input.is_action_pressed("move_forward") or \
-	   Input.is_action_pressed("move_backward") or \
-	   Input.is_action_pressed("turn_left") or \
-	   Input.is_action_pressed("turn_right"):
-		print("VehicleIdleState: Detected movement input")
+	# Check for movement inputs beginning
+	if event.is_action_pressed("move_forward") or \
+	   event.is_action_pressed("move_backward") or \
+	   event.is_action_pressed("turn_left") or \
+	   event.is_action_pressed("turn_right"):
+		print("VehicleIdleState: Detected movement input, transitioning to Moving state")
 		return "Moving"
 	
 	# Check for fire input
-	if Input.is_action_just_pressed("fire"):
+	if event.is_action_pressed("fire"):
 		print("VehicleIdleState: Detected fire input")
 		if owner_node is Vehicle:
-			var weapon_component_script = load("res://scripts/components/WeaponComponent.gd")
-			var weapon_component = owner_node.get_component(weapon_component_script)
+			var weapon_component = owner_node.get_component(WeaponComponent)
 			if weapon_component:
 				weapon_component.fire()
 	
 	return ""
 
 func update(delta: float) -> void:
-	# Check inputs continuously for transitions
+	# Also check inputs continuously for transitions
+	# This helps catch inputs that might be missed by the event system
 	if Input.is_action_pressed("move_forward") or \
 	   Input.is_action_pressed("move_backward") or \
 	   Input.is_action_pressed("turn_left") or \
@@ -49,7 +51,7 @@ func get_transition() -> String:
 	   Input.is_action_pressed("move_backward") or \
 	   Input.is_action_pressed("turn_left") or \
 	   Input.is_action_pressed("turn_right"):
-		print("VehicleIdleState transition: Detected movement input")
+		print("VehicleIdleState transition: Detected movement input, returning Moving state")
 		return "Moving"
 	
 	return ""
