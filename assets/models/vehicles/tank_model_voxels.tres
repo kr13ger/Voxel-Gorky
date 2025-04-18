@@ -1,0 +1,930 @@
+[gd_resource type="Resource" format=3 uid="uid://bxu0woo3tpbfc"]
+
+[resource]
+metadata/voxel_data = {
+"-1,0,-1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 0, -1),
+"type": "metal"
+},
+"-1,0,-2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 0, -2),
+"type": "metal"
+},
+"-1,0,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 0, -3),
+"type": "metal"
+},
+"-1,0,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(-1, 0, -4),
+"type": "armor"
+},
+"-1,0,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(-1, 0, -5),
+"type": "armor"
+},
+"-1,0,0": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 0, 0),
+"type": "metal"
+},
+"-1,0,1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 0, 1),
+"type": "metal"
+},
+"-1,0,2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 0, 2),
+"type": "metal"
+},
+"-1,0,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 0, 3),
+"type": "metal"
+},
+"-1,0,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 0, 4),
+"type": "metal"
+},
+"-1,0,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 0, 5),
+"type": "metal"
+},
+"-1,1,-1": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(-1, 1, -1),
+"type": "turret"
+},
+"-1,1,-2": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(-1, 1, -2),
+"type": "turret"
+},
+"-1,1,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 1, -3),
+"type": "metal"
+},
+"-1,1,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(-1, 1, -4),
+"type": "armor"
+},
+"-1,1,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(-1, 1, -5),
+"type": "armor"
+},
+"-1,1,0": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(-1, 1, 0),
+"type": "turret"
+},
+"-1,1,1": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(-1, 1, 1),
+"type": "turret"
+},
+"-1,1,2": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(-1, 1, 2),
+"type": "turret"
+},
+"-1,1,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 1, 3),
+"type": "metal"
+},
+"-1,1,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 1, 4),
+"type": "metal"
+},
+"-1,1,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-1, 1, 5),
+"type": "metal"
+},
+"-2,0,-1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 0, -1),
+"type": "metal"
+},
+"-2,0,-2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 0, -2),
+"type": "metal"
+},
+"-2,0,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 0, -3),
+"type": "metal"
+},
+"-2,0,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(-2, 0, -4),
+"type": "armor"
+},
+"-2,0,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(-2, 0, -5),
+"type": "armor"
+},
+"-2,0,0": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 0, 0),
+"type": "metal"
+},
+"-2,0,1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 0, 1),
+"type": "metal"
+},
+"-2,0,2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 0, 2),
+"type": "metal"
+},
+"-2,0,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 0, 3),
+"type": "metal"
+},
+"-2,0,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 0, 4),
+"type": "metal"
+},
+"-2,0,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 0, 5),
+"type": "metal"
+},
+"-2,1,-1": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(-2, 1, -1),
+"type": "turret"
+},
+"-2,1,-2": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(-2, 1, -2),
+"type": "turret"
+},
+"-2,1,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 1, -3),
+"type": "metal"
+},
+"-2,1,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(-2, 1, -4),
+"type": "armor"
+},
+"-2,1,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(-2, 1, -5),
+"type": "armor"
+},
+"-2,1,0": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(-2, 1, 0),
+"type": "turret"
+},
+"-2,1,1": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(-2, 1, 1),
+"type": "turret"
+},
+"-2,1,2": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(-2, 1, 2),
+"type": "turret"
+},
+"-2,1,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 1, 3),
+"type": "metal"
+},
+"-2,1,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 1, 4),
+"type": "metal"
+},
+"-2,1,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-2, 1, 5),
+"type": "metal"
+},
+"-3,0,-1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 0, -1),
+"type": "metal"
+},
+"-3,0,-2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 0, -2),
+"type": "metal"
+},
+"-3,0,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 0, -3),
+"type": "metal"
+},
+"-3,0,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(-3, 0, -4),
+"type": "armor"
+},
+"-3,0,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(-3, 0, -5),
+"type": "armor"
+},
+"-3,0,0": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 0, 0),
+"type": "metal"
+},
+"-3,0,1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 0, 1),
+"type": "metal"
+},
+"-3,0,2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 0, 2),
+"type": "metal"
+},
+"-3,0,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 0, 3),
+"type": "metal"
+},
+"-3,0,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 0, 4),
+"type": "metal"
+},
+"-3,0,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 0, 5),
+"type": "metal"
+},
+"-3,1,-1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 1, -1),
+"type": "metal"
+},
+"-3,1,-2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 1, -2),
+"type": "metal"
+},
+"-3,1,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 1, -3),
+"type": "metal"
+},
+"-3,1,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(-3, 1, -4),
+"type": "armor"
+},
+"-3,1,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(-3, 1, -5),
+"type": "armor"
+},
+"-3,1,0": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 1, 0),
+"type": "metal"
+},
+"-3,1,1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 1, 1),
+"type": "metal"
+},
+"-3,1,2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 1, 2),
+"type": "metal"
+},
+"-3,1,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 1, 3),
+"type": "metal"
+},
+"-3,1,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 1, 4),
+"type": "metal"
+},
+"-3,1,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(-3, 1, 5),
+"type": "metal"
+},
+"0,0,-1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 0, -1),
+"type": "metal"
+},
+"0,0,-2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 0, -2),
+"type": "metal"
+},
+"0,0,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 0, -3),
+"type": "metal"
+},
+"0,0,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(0, 0, -4),
+"type": "armor"
+},
+"0,0,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(0, 0, -5),
+"type": "armor"
+},
+"0,0,0": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 0, 0),
+"type": "metal"
+},
+"0,0,1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 0, 1),
+"type": "metal"
+},
+"0,0,2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 0, 2),
+"type": "metal"
+},
+"0,0,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 0, 3),
+"type": "metal"
+},
+"0,0,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 0, 4),
+"type": "metal"
+},
+"0,0,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 0, 5),
+"type": "metal"
+},
+"0,1,-1": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(0, 1, -1),
+"type": "turret"
+},
+"0,1,-2": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(0, 1, -2),
+"type": "turret"
+},
+"0,1,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 1, -3),
+"type": "metal"
+},
+"0,1,-4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 1, -4),
+"type": "metal"
+},
+"0,1,-5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 1, -5),
+"type": "metal"
+},
+"0,1,0": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(0, 1, 0),
+"type": "turret"
+},
+"0,1,1": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(0, 1, 1),
+"type": "turret"
+},
+"0,1,2": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(0, 1, 2),
+"type": "turret"
+},
+"0,1,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 1, 3),
+"type": "metal"
+},
+"0,1,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 1, 4),
+"type": "metal"
+},
+"0,1,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(0, 1, 5),
+"type": "metal"
+},
+"1,0,-1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 0, -1),
+"type": "metal"
+},
+"1,0,-2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 0, -2),
+"type": "metal"
+},
+"1,0,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 0, -3),
+"type": "metal"
+},
+"1,0,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(1, 0, -4),
+"type": "armor"
+},
+"1,0,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(1, 0, -5),
+"type": "armor"
+},
+"1,0,0": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 0, 0),
+"type": "metal"
+},
+"1,0,1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 0, 1),
+"type": "metal"
+},
+"1,0,2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 0, 2),
+"type": "metal"
+},
+"1,0,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 0, 3),
+"type": "metal"
+},
+"1,0,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 0, 4),
+"type": "metal"
+},
+"1,0,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 0, 5),
+"type": "metal"
+},
+"1,1,-1": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(1, 1, -1),
+"type": "turret"
+},
+"1,1,-2": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(1, 1, -2),
+"type": "turret"
+},
+"1,1,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 1, -3),
+"type": "metal"
+},
+"1,1,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(1, 1, -4),
+"type": "armor"
+},
+"1,1,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(1, 1, -5),
+"type": "armor"
+},
+"1,1,0": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(1, 1, 0),
+"type": "turret"
+},
+"1,1,1": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(1, 1, 1),
+"type": "turret"
+},
+"1,1,2": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(1, 1, 2),
+"type": "turret"
+},
+"1,1,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 1, 3),
+"type": "metal"
+},
+"1,1,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 1, 4),
+"type": "metal"
+},
+"1,1,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(1, 1, 5),
+"type": "metal"
+},
+"2,0,-1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 0, -1),
+"type": "metal"
+},
+"2,0,-2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 0, -2),
+"type": "metal"
+},
+"2,0,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 0, -3),
+"type": "metal"
+},
+"2,0,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(2, 0, -4),
+"type": "armor"
+},
+"2,0,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(2, 0, -5),
+"type": "armor"
+},
+"2,0,0": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 0, 0),
+"type": "metal"
+},
+"2,0,1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 0, 1),
+"type": "metal"
+},
+"2,0,2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 0, 2),
+"type": "metal"
+},
+"2,0,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 0, 3),
+"type": "metal"
+},
+"2,0,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 0, 4),
+"type": "metal"
+},
+"2,0,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 0, 5),
+"type": "metal"
+},
+"2,1,-1": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(2, 1, -1),
+"type": "turret"
+},
+"2,1,-2": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(2, 1, -2),
+"type": "turret"
+},
+"2,1,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 1, -3),
+"type": "metal"
+},
+"2,1,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(2, 1, -4),
+"type": "armor"
+},
+"2,1,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(2, 1, -5),
+"type": "armor"
+},
+"2,1,0": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(2, 1, 0),
+"type": "turret"
+},
+"2,1,1": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(2, 1, 1),
+"type": "turret"
+},
+"2,1,2": {
+"health": 60.0,
+"instance": null,
+"position": Vector3i(2, 1, 2),
+"type": "turret"
+},
+"2,1,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 1, 3),
+"type": "metal"
+},
+"2,1,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 1, 4),
+"type": "metal"
+},
+"2,1,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(2, 1, 5),
+"type": "metal"
+},
+"3,0,-1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 0, -1),
+"type": "metal"
+},
+"3,0,-2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 0, -2),
+"type": "metal"
+},
+"3,0,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 0, -3),
+"type": "metal"
+},
+"3,0,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(3, 0, -4),
+"type": "armor"
+},
+"3,0,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(3, 0, -5),
+"type": "armor"
+},
+"3,0,0": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 0, 0),
+"type": "metal"
+},
+"3,0,1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 0, 1),
+"type": "metal"
+},
+"3,0,2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 0, 2),
+"type": "metal"
+},
+"3,0,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 0, 3),
+"type": "metal"
+},
+"3,0,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 0, 4),
+"type": "metal"
+},
+"3,0,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 0, 5),
+"type": "metal"
+},
+"3,1,-1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 1, -1),
+"type": "metal"
+},
+"3,1,-2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 1, -2),
+"type": "metal"
+},
+"3,1,-3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 1, -3),
+"type": "metal"
+},
+"3,1,-4": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(3, 1, -4),
+"type": "armor"
+},
+"3,1,-5": {
+"health": 80.0,
+"instance": null,
+"position": Vector3i(3, 1, -5),
+"type": "armor"
+},
+"3,1,0": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 1, 0),
+"type": "metal"
+},
+"3,1,1": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 1, 1),
+"type": "metal"
+},
+"3,1,2": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 1, 2),
+"type": "metal"
+},
+"3,1,3": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 1, 3),
+"type": "metal"
+},
+"3,1,4": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 1, 4),
+"type": "metal"
+},
+"3,1,5": {
+"health": 50.0,
+"instance": null,
+"position": Vector3i(3, 1, 5),
+"type": "metal"
+}
+}
+metadata/voxel_size = 0.5

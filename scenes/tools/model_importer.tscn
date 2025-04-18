@@ -5,3 +5,4 @@
 [node name="Node" type="Node"]
 script = ExtResource("1_d7x4m")
 model_path = "res://assets/models/vehicles/tank_model.obj"
+use_fallback = true

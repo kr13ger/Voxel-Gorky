@@ -1,3 +1,4 @@
+# scripts/states/VehicleMovingState.gd
 extends State
 class_name VehicleMovingState
 
@@ -5,8 +6,9 @@ var _physics_component: VehiclePhysicsComponent = null
 
 func enter() -> void:
 	print("VehicleMovingState: Entered")
-	if owner_node is Vehicle:
-		# Get physics component directly instead of loading script
+	# The issue is here - we need to check for either Vehicle or VoxelVehicle
+	if owner_node:
+		# Try to get physics component without type checking
 		_physics_component = owner_node.get_component(VehiclePhysicsComponent)
 		if _physics_component:
 			print("VehicleMovingState: Got physics component successfully")

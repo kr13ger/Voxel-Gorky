@@ -10,6 +10,7 @@ func voxelize_mesh(mesh: Mesh, material_map: Dictionary = {}) -> Dictionary:
 	
 	# Get the mesh AABB
 	var aabb = mesh.get_aabb()
+	print("Mesh AABB: ", aabb)
 	
 	# Calculate grid dimensions based on AABB
 	var grid_dimensions = Vector3i(
@@ -17,9 +18,14 @@ func voxelize_mesh(mesh: Mesh, material_map: Dictionary = {}) -> Dictionary:
 		ceil(aabb.size.y / voxel_size),
 		ceil(aabb.size.z / voxel_size)
 	)
+	print("Grid dimensions: ", grid_dimensions)
 	
-	# Create a voxel grid
-	# Using raycasting to determine which points are inside the mesh
+	# Safety check for excessive grid size
+	if grid_dimensions.x * grid_dimensions.y * grid_dimensions.z > 100000:
+		print("WARNING: Very large voxel grid detected. Limiting to avoid performance issues.")
+		return _create_basic_shape()
+	
+	# Create a voxel grid based on AABB shape instead of ray testing
 	for x in range(grid_dimensions.x):
 		for y in range(grid_dimensions.y):
 			for z in range(grid_dimensions.z):
@@ -29,7 +35,8 @@ func voxelize_mesh(mesh: Mesh, material_map: Dictionary = {}) -> Dictionary:
 					z * voxel_size + voxel_size/2 + aabb.position.z
 				)
 				
-				if point_in_mesh(mesh, local_pos):
+				# Simple check if point is within AABB bounds
+				if is_point_likely_in_mesh(local_pos, aabb):
 					var voxel_key = "%d,%d,%d" % [x, y, z]
 					
 					# Determine voxel type based on position
@@ -51,33 +58,53 @@ func voxelize_mesh(mesh: Mesh, material_map: Dictionary = {}) -> Dictionary:
 						"instance": null
 					}
 	
+	print("Voxelization complete. Created ", voxel_data.size(), " voxels.")
 	return voxel_data
 
-# Using a simplified point-in-mesh test
-func point_in_mesh(mesh: Mesh, point: Vector3) -> bool:
-	# Simplified implementation - cast rays in 6 directions
-	# If odd number of intersections in each direction, point is inside
+# A faster, simplified check that doesn't use ray casting
+# Just checks if the point is inside a slightly smaller AABB to create a solid shape
+func is_point_likely_in_mesh(point: Vector3, aabb: AABB) -> bool:
+	# Shrink AABB slightly to create a shell effect
+	var inner_aabb = AABB(
+		aabb.position + aabb.size * 0.1,
+		aabb.size * 0.8
+	)
 	
-	# In a full implementation, you'd use proper geometric algorithms
-	# This is a placeholder for the actual geometric test
+	return inner_aabb.has_point(point)
+
+# Fallback method to create a simple tank-like shape if the mesh processing fails
+func _create_basic_shape() -> Dictionary:
+	print("Creating basic tank shape as fallback")
+	var tank_data = {}
 	
-	# For demonstration, let's return a simple approximation
-	# (In a real implementation, you would do proper intersection tests)
-	var directions = [
-		Vector3(1, 0, 0), Vector3(-1, 0, 0),
-		Vector3(0, 1, 0), Vector3(0, -1, 0),
-		Vector3(0, 0, 1), Vector3(0, 0, -1)
-	]
+	# Create a simple box shape for the tank body
+	for x in range(-3, 4):
+		for y in range(0, 2):
+			for z in range(-5, 6):
+				var voxel_key = "%d,%d,%d" % [x, y, z]
+				var voxel_type = "metal"
+				
+				# Make top part the turret
+				if y == 1 and abs(x) <= 2 and abs(z) <= 2:
+					voxel_type = "turret"
+				
+				# Make front armor
+				if z < -3:
+					voxel_type = "armor"
+					
+				# Add gun barrel
+				if y == 1 and x == 0 and z < -2:
+					voxel_type = "metal"
+					
+				tank_data[voxel_key] = {
+					"type": voxel_type,
+					"position": Vector3i(x, y, z),
+					"health": get_voxel_health(voxel_type),
+					"instance": null
+				}
 	
-	var intersection_count = 0
-	for dir in directions:
-		# In a real implementation, you would use mesh.intersect_ray() or similar
-		# Here we're just approximating for demonstration
-		var test_point = point + dir * 1000
-		# Placeholder for actual ray-mesh intersection test
-		intersection_count += 1  # This should be actual test result
-	
-	return intersection_count % 2 == 1
+	print("Created basic tank with ", tank_data.size(), " voxels")
+	return tank_data
 
 func get_voxel_health(voxel_type: String) -> float:
 	match voxel_type:

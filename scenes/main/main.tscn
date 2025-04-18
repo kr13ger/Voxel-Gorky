@@ -12,6 +12,7 @@ voxel_size = 2.0
 
 [node name="PlayerVehicle" type="CharacterBody3D" parent="."]
 script = ExtResource("2_6q06x")
+voxel_model_path = "res://assets/models/vehicles/tank_model_voxels.tres"
 
 [node name="SpringArm3D" type="SpringArm3D" parent="PlayerVehicle"]
 transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 2, 0)
