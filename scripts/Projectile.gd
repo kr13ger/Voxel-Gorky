@@ -95,10 +95,12 @@ func _on_area_entered(area: Area3D) -> void:
 func _handle_collision(collider: Node3D) -> void:
 	Logger.debug("Projectile hit: %s" % collider.name, "Projectile")
 	
-	# Apply damage
-	if explosive:
-		_explode()
+	# Check if we hit a voxel vehicle
+	if collider is VoxelVehicle:
+		# Apply damage to the specific voxel at impact point
+		collider.damage_voxel(global_position, damage)
 	else:
+		# Regular damage handling
 		_apply_damage(collider)
 	
 	# Destroy projectile

@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://ccvv2isg1gw8d"]
+
+[ext_resource type="Script" uid="uid://n1fwqxi61ffn" path="res://scripts/tools/ModelImporter.gd" id="1_d7x4m"]
+
+[node name="Node" type="Node"]
+script = ExtResource("1_d7x4m")
+model_path = "res://assets/models/vehicles/tank_model.obj"

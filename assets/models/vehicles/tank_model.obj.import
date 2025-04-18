@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cji14nvbxrcpa"
+path="res://.godot/imported/tank_model.obj-1a8adb8e6193fd8c89dc88a6e7bd165c.mesh"
+
+[deps]
+
+files=["res://.godot/imported/tank_model.obj-1a8adb8e6193fd8c89dc88a6e7bd165c.mesh"]
+
+source_file="res://assets/models/vehicles/tank_model.obj"
+dest_files=["res://.godot/imported/tank_model.obj-1a8adb8e6193fd8c89dc88a6e7bd165c.mesh", "res://.godot/imported/tank_model.obj-1a8adb8e6193fd8c89dc88a6e7bd165c.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
