@@ -1,9 +1,12 @@
+# scripts/tools/ModelImporter.gd
 extends Node
 
 @export var model_path: String = ""
 @export var output_path: String = "res://assets/models/vehicles/"
 @export var voxel_size: float = 0.5
 @export var use_fallback: bool = false
+@export_enum("Low", "Medium", "High") var detail_level: int = 0
+@export var adaptive_resolution: bool = false
 
 func _ready():
 	print("ModelImporter starting...")
@@ -16,6 +19,7 @@ func _ready():
 		_create_fallback_model()
 	else:
 		print("Attempting to voxelize model: ", model_path)
+		print("Detail level: ", ["Low", "Medium", "High"][detail_level])
 		voxelize_model()
 	
 func voxelize_model():
@@ -38,7 +42,20 @@ func voxelize_model():
 	
 	# Create voxelizer and process mesh
 	var voxelizer = MeshVoxelizer.new()
-	voxelizer.voxel_size = voxel_size
+	
+	# Adjust voxel size based on detail level
+	if adaptive_resolution:
+		match detail_level:
+			0: # Low
+				voxelizer.voxel_size = voxel_size
+			1: # Medium
+				voxelizer.voxel_size = voxel_size * 0.5
+			2: # High
+				voxelizer.voxel_size = voxel_size * 0.25
+	else:
+		voxelizer.voxel_size = voxel_size
+	
+	voxelizer.detail_level = detail_level
 	
 	# Material mappings - define regions and their material types
 	var material_map = {
@@ -70,6 +87,7 @@ func _create_fallback_model():
 	
 	var voxelizer = MeshVoxelizer.new()
 	voxelizer.voxel_size = voxel_size
+	voxelizer.detail_level = detail_level
 	var voxel_data = voxelizer._create_basic_shape()
 	
 	_save_voxel_data(voxel_data)
@@ -86,11 +104,13 @@ func _save_voxel_data(voxel_data: Dictionary):
 	var resource = Resource.new()
 	resource.set_meta("voxel_data", voxel_data)
 	resource.set_meta("voxel_size", voxel_size)
+	resource.set_meta("detail_level", detail_level)
 	
-	# Generate filename
-	var filename = "tank_voxel_model.tres"
+	# Generate filename with detail level
+	var detail_suffix = ["_low", "_medium", "_high"][detail_level]
+	var filename = "tank_voxel_model" + detail_suffix + ".tres"
 	if not model_path.is_empty():
-		filename = model_path.get_file().get_basename() + "_voxels.tres"
+		filename = model_path.get_file().get_basename() + "_voxels" + detail_suffix + ".tres"
 	
 	var save_path = output_path.path_join(filename)
 	

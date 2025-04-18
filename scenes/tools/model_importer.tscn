@@ -6,3 +6,5 @@
 script = ExtResource("1_d7x4m")
 model_path = "res://assets/models/vehicles/tank_model.obj"
 use_fallback = true
+detail_level = 1
+adaptive_resolution = true

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" format=3 uid="uid://bxu0woo3tpbfc"]
+[gd_resource type="Resource" format=3]
 
 [resource]
 metadata/voxel_data = {
@@ -927,4 +927,4 @@ metadata/voxel_data = {
 "type": "metal"
 }
 }
-metadata/voxel_size = 0.5
+metadata/voxel_size = 1.0
