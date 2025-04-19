@@ -11,22 +11,26 @@ environment_size = Vector3(100, 10, 100)
 voxel_size = 2.0
 
 [node name="PlayerVehicle" type="CharacterBody3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
 script = ExtResource("2_6q06x")
-voxel_model_path = "res://assets/models/vehicles/Car_voxels_medium.tres"
+voxel_model_path = "res://assets/models/vehicles/tank_model_3_voxels_high.tres"
 voxel_size = 1.0
 
 [node name="SpringArm3D" type="SpringArm3D" parent="PlayerVehicle"]
-transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 20000, 0)
 spring_length = 8.0
 margin = 0.5
 
 [node name="Camera3D" type="Camera3D" parent="PlayerVehicle/SpringArm3D"]
-transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 143.056, 128.549, 60.5376)
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 143.056, 407.006, 161.888)
 current = true
 fov = 45.0
 far = 300.0
 
 [node name="Environment" type="Node3D" parent="."]
+
+[node name="SpotLight3D" type="SpotLight3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 418, 0)
 
 [node name="ProjectilePoolManager" type="Node" parent="."]
 script = ExtResource("2_l3cfh")
