@@ -5,7 +5,9 @@
 [node name="ModelImporterEnhanced" type="Node3D"]
 script = ExtResource("1_d7x4m")
 model_path = "res://assets/models/vehicles/tank_model_2.obj"
+output_path = null
 voxel_size = 1.0
+use_fallback = null
 detail_level = 1
 adaptive_resolution = true
 
@@ -102,6 +104,32 @@ text = "Adaptive Resolution:"
 [node name="AdaptiveCheck" type="CheckBox" parent="UI/ParametersPanel/VBoxContainer/GridContainer"]
 layout_mode = 2
 button_pressed = true
+
+[node name="ThicknessLabel" type="Label" parent="UI/ParametersPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Thickness:"
+
+[node name="ThicknessContainer" type="VBoxContainer" parent="UI/ParametersPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ThicknessEnabled" type="CheckBox" parent="UI/ParametersPanel/VBoxContainer/GridContainer/ThicknessContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Apply Thickness"
+
+[node name="ThicknessSlider" type="HSlider" parent="UI/ParametersPanel/VBoxContainer/GridContainer/ThicknessContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+step = 5.0
+value = 100.0
+tick_count = 5
+ticks_on_borders = true
+
+[node name="ThicknessValue" type="Label" parent="UI/ParametersPanel/VBoxContainer/GridContainer/ThicknessContainer"]
+layout_mode = 2
+text = "Thickness: 100%"
+horizontal_alignment = 1
 
 [node name="ModelLabel" type="Label" parent="UI/ParametersPanel/VBoxContainer/GridContainer"]
 layout_mode = 2

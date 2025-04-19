@@ -6,6 +6,8 @@ var voxel_size: float = 0.5
 var voxel_data: Dictionary = {}
 var detail_level: int = 0 # 0=Low, 1=Medium, 2=High
 var debug_mode: bool = true # Set to true to get more detailed logging
+var thickness_percentage: float = 100.0  # Range: 0-100%
+var apply_thickness: bool = true  # Whether to apply thickness at all
 
 # Set this extremely high for complex models
 var ABSOLUTE_MAX_VOXELS: int = 2000000  # 2 million voxel limit
@@ -364,12 +366,79 @@ func _convert_grid_to_voxels(grid: Array, grid_dimensions: Vector3i, aabb: AABB,
 	print("Grid conversion complete. Created ", voxel_count, " voxels.")
 
 # Add thickness to surface voxels based on detail level
-func _add_thickness(grid_dimensions: Vector3i, detail: int) -> void:
+func _add_thickness(grid_dimensions: Vector3i) -> void:
+	# Skip if thickness is disabled
+	if not apply_thickness or thickness_percentage <= 0:
+		print("Thickness not applied (disabled or 0%)")
+		return
+		
+	print("Adding thickness at ", thickness_percentage, "% strength...")
+	
+	# Copy keys to avoid modifying the dictionary while iterating
+	var original_keys = voxel_data.keys()
+	var original_count = original_keys.size()
+	
+	# Add neighbors to each voxel
+	for key in original_keys:
+		var parts = key.split(",")
+		var x = int(parts[0])
+		var y = int(parts[1])
+		var z = int(parts[2])
+		
+		var voxel_type = voxel_data[key].type
+		
+		# Thickness based on detail level
+		var thickness = 1
+		if detail_level >= 2:
+			thickness = 2
+		
+		# Add neighbors
+		for dx in range(-thickness, thickness+1):
+			for dy in range(-thickness, thickness+1):
+				for dz in range(-thickness, thickness+1):
+					# Skip the original voxel and distant neighbors
+					if dx == 0 and dy == 0 and dz == 0:
+						continue
+					
+					# Use manhattan distance for thickness
+					var dist = abs(dx) + abs(dy) + abs(dz)
+					if dist > thickness:
+						continue
+					
+					# Apply thickness percentage - probabilistic approach
+					if randf() * 100.0 > thickness_percentage:
+						continue
+					
+					# Calculate neighbor position
+					var nx = x + dx
+					var ny = y + dy
+					var nz = z + dz
+					
+					# Skip if out of bounds
+					if nx < 0 or nx >= grid_dimensions.x or \
+					   ny < 0 or ny >= grid_dimensions.y or \
+					   nz < 0 or nz >= grid_dimensions.z:
+						continue
+					
+					# Create neighbor key
+					var neighbor_key = "%d,%d,%d" % [nx, ny, nz]
+					
+					# Add if not already exists
+					if not voxel_data.has(neighbor_key):
+						voxel_data[neighbor_key] = {
+							"type": voxel_type,
+							"position": Vector3i(nx, ny, nz),
+							"health": get_voxel_health(voxel_type),
+							"instance": null
+						}
+	
+	var added = voxel_data.size() - original_count
+	print("Added ", added, " voxels for thickness.")
 	print("Adding thickness based on detail level ", detail, "...")
 	
 	# Create a list of original keys to avoid modifying while iterating
-	var original_keys = voxel_data.keys()
-	var original_count = original_keys.size()
+	original_keys = voxel_data.keys()
+	original_count = original_keys.size()
 	
 	# Determine thickness based on detail level
 	var thickness = 1
@@ -431,11 +500,11 @@ func _add_thickness(grid_dimensions: Vector3i, detail: int) -> void:
 					# Check limit
 					if voxel_data.size() >= ABSOLUTE_MAX_VOXELS:
 						print("WARNING: Reached voxel limit while adding thickness.")
-						var added = voxel_data.size() - original_count
+						added = voxel_data.size() - original_count
 						print("Added ", added, " thickness voxels before limit.")
 						return
 	
-	var added = voxel_data.size() - original_count
+	added = voxel_data.size() - original_count
 	print("Added ", added, " thickness voxels.")
 
 # Fallback method to create a simple tank-like shape if the mesh processing fails

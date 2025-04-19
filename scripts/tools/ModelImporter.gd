@@ -4,9 +4,9 @@ extends Node3D
 @export var model_path: String = ""
 @export var output_path: String = "res://assets/models/vehicles/"
 @export var voxel_size: float = 0.5
-@export var use_fallback: bool = false
 @export_enum("Low", "Medium", "High") var detail_level: int = 0
 @export var adaptive_resolution: bool = false
+@export var debug_mode: bool = false
 
 # UI references
 @onready var model_container = $ModelContainer
@@ -21,6 +21,11 @@ extends Node3D
 @onready var file_dialog = $UI/FileDialog
 @onready var material_regions_dialog = $UI/MaterialRegionsDialog
 @onready var camera = $Camera3D
+
+# Thickness control UI references
+@onready var thickness_enabled = $UI/ParametersPanel/VBoxContainer/GridContainer/ThicknessContainer/ThicknessEnabled
+@onready var thickness_slider = $UI/ParametersPanel/VBoxContainer/GridContainer/ThicknessContainer/ThicknessSlider
+@onready var thickness_value = $UI/ParametersPanel/VBoxContainer/GridContainer/ThicknessContainer/ThicknessValue
 
 # Internal variables
 var loaded_model: MeshInstance3D
@@ -148,6 +153,13 @@ func _setup_ui():
 	
 	model_path_edit.text = model_path
 	model_path_edit.text_submitted.connect(_on_model_path_changed)
+	
+	# Connect thickness control signals
+	thickness_enabled.toggled.connect(_on_thickness_enabled_toggled)
+	thickness_slider.value_changed.connect(_on_thickness_slider_changed)
+	
+	# Initialize thickness value display
+	_on_thickness_slider_changed(thickness_slider.value)
 	
 	# View control checkboxes
 	$UI/ViewControls/VBoxContainer/ShowModelCheck.toggled.connect(_on_show_model_toggled)
@@ -417,6 +429,10 @@ func create_voxel_preview():
 	voxelizer.voxel_size = adjusted_voxel_size
 	voxelizer.detail_level = detail_level
 	
+	# Configure thickness settings
+	voxelizer.apply_thickness = thickness_enabled.button_pressed
+	voxelizer.thickness_percentage = thickness_slider.value
+	
 	# Process the model
 	var mesh_resource
 	if loaded_model:
@@ -501,7 +517,7 @@ func create_voxel_preview():
 	
 	status_label.text = "Voxel preview created with " + str(voxel_count) + "/" + str(current_voxel_data.size()) + " voxels in " + str((end_time - start_time) / 1000.0) + " seconds"
 
-# Create a preview of the fallback model
+# Create a fallback model preview
 func _create_fallback_model_preview():
 	status_label.text = "Creating fallback model preview..."
 	
@@ -513,6 +529,10 @@ func _create_fallback_model_preview():
 	# Configure voxelizer
 	voxelizer.voxel_size = voxel_size
 	voxelizer.detail_level = detail_level
+	
+	# Configure thickness settings
+	voxelizer.apply_thickness = thickness_enabled.button_pressed
+	voxelizer.thickness_percentage = thickness_slider.value
 	
 	# Clear any existing preview
 	for child in preview_container.get_children():
@@ -559,44 +579,62 @@ func _create_fallback_model_preview():
 	orbit_center = Vector3.ZERO
 	_update_camera_position()
 	
-	# Create a visual representation for each voxel
-	for key in current_voxel_data:
-		var voxel = current_voxel_data[key]
-		var pos = voxel["position"]
-		
-		var voxel_preview = MeshInstance3D.new()
-		var cube_mesh = BoxMesh.new()
-		cube_mesh.size = Vector3.ONE * voxel_size * 0.9  # Slightly smaller to see boundaries
-		voxel_preview.mesh = cube_mesh
-		
-		# Position relative to origin
-		voxel_preview.position = Vector3(
-			pos.x * voxel_size,
-			pos.y * voxel_size,
-			pos.z * voxel_size
-		)
-		
-		# Apply material based on type
-		var material = StandardMaterial3D.new()
-		material.flags_transparent = true
-		match voxel["type"]:
-			"metal":
-				material.albedo_color = Color(0.6, 0.6, 0.8, 0.7)
-			"armor":
-				material.albedo_color = Color(0.3, 0.3, 0.4, 0.7)
-			"turret":
-				material.albedo_color = Color(0.5, 0.5, 0.7, 0.7)
-			"glass":
-				material.albedo_color = Color(0.8, 0.9, 1.0, 0.5)
-			"engine":
-				material.albedo_color = Color(0.7, 0.3, 0.3, 0.7)
-			_:
-				material.albedo_color = Color(0.7, 0.7, 0.7, 0.7)
-		
-		voxel_preview.material_override = material
-		preview_voxels.add_child(voxel_preview)
+	# Create a visual representation for each voxel in batches
+	var voxel_count = 0
+	var total_voxels = current_voxel_data.size()
+	var keys = current_voxel_data.keys()
+	var max_voxels_per_frame = 1000
 	
-	status_label.text = "Fallback model preview created with " + str(preview_voxels.get_child_count()) + " voxels"
+	for i in range(0, keys.size(), max_voxels_per_frame):
+		var batch_end = min(i + max_voxels_per_frame, keys.size())
+		
+		# Process this batch of voxels
+		for j in range(i, batch_end):
+			var key = keys[j]
+			var voxel = current_voxel_data[key]
+			var pos = voxel["position"]
+			
+			var voxel_preview = MeshInstance3D.new()
+			var cube_mesh = BoxMesh.new()
+			cube_mesh.size = Vector3.ONE * voxel_size * 0.9  # Slightly smaller to see boundaries
+			voxel_preview.mesh = cube_mesh
+			
+			# Position relative to origin
+			voxel_preview.position = Vector3(
+				pos.x * voxel_size,
+				pos.y * voxel_size,
+				pos.z * voxel_size
+			)
+			
+			# Apply material based on type
+			var material = StandardMaterial3D.new()
+			material.flags_transparent = true
+			match voxel["type"]:
+				"metal":
+					material.albedo_color = Color(0.6, 0.6, 0.8, 0.7)
+				"armor":
+					material.albedo_color = Color(0.3, 0.3, 0.4, 0.7)
+				"turret":
+					material.albedo_color = Color(0.5, 0.5, 0.7, 0.7)
+				"glass":
+					material.albedo_color = Color(0.8, 0.9, 1.0, 0.5)
+				"engine":
+					material.albedo_color = Color(0.7, 0.3, 0.3, 0.7)
+				_:
+					material.albedo_color = Color(0.7, 0.7, 0.7, 0.7)
+			
+			voxel_preview.material_override = material
+			preview_voxels.add_child(voxel_preview)
+			voxel_count += 1
+		
+		# Update status and yield to allow UI updates
+		var percentage = (float(voxel_count) / total_voxels) * 100.0
+		status_label.text = "Creating preview: %d/%d voxels (%.1f%%)" % [voxel_count, total_voxels, percentage]
+		
+		# Yield to allow UI to update and prevent hanging
+		await get_tree().process_frame
+	
+	status_label.text = "Fallback model preview created with " + str(voxel_count) + " voxels"
 
 # Save the current voxel data
 func save_current_voxel_data():
@@ -610,11 +648,17 @@ func save_current_voxel_data():
 	resource.set_meta("voxel_size", voxel_size)
 	resource.set_meta("detail_level", detail_level)
 	
+	# Add thickness settings to the metadata
+	resource.set_meta("thickness_applied", thickness_enabled.button_pressed)
+	resource.set_meta("thickness_percentage", thickness_slider.value)
+	
 	# Generate filename with detail level
 	var detail_suffix = ["_low", "_medium", "_high"][detail_level]
-	var filename = "tank_voxel_model" + detail_suffix + ".tres"
+	var thickness_text = "_thickness" + str(int(thickness_slider.value)) if thickness_enabled.button_pressed else "_nothickness"
+	var filename = "tank_voxel_model" + detail_suffix + thickness_text + ".tres"
+	
 	if not model_path.is_empty():
-		filename = model_path.get_file().get_basename() + "_voxels" + detail_suffix + ".tres"
+		filename = model_path.get_file().get_basename() + "_voxels" + detail_suffix + thickness_text + ".tres"
 	
 	var save_path = output_path.path_join(filename)
 	
@@ -927,6 +971,15 @@ func _on_model_path_changed(new_path):
 	
 	# Don't automatically load the model - user should press the Load button
 
+# Thickness control functions
+func _on_thickness_enabled_toggled(enabled):
+	thickness_slider.editable = enabled
+	status_label.text = "Thickness " + ("enabled" if enabled else "disabled")
+
+func _on_thickness_slider_changed(value):
+	thickness_value.text = "Thickness: " + str(int(value)) + "%"
+	status_label.text = "Thickness set to " + str(int(value)) + "%"
+
 func _on_region_value_changed(value, material_name):
 	# Update material map from UI
 	_update_material_map_from_ui()
@@ -1011,88 +1064,3 @@ func _on_save_button_pressed():
 
 func _on_quit_button_pressed():
 	get_tree().quit()
-
-func create_optimized_preview():
-	status_label.text = "Creating optimized preview..."
-	
-	# Option to create an optimized preview for very large models
-	# This creates a single mesh instance rather than thousands of individual ones
-	
-	# Create a single mesh with all voxels combined
-	var st = SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	
-	var cube_mesh = BoxMesh.new()
-	cube_mesh.size = Vector3.ONE * voxel_size * 0.9
-	var cube_arrays = cube_mesh.surface_get_arrays(0)
-	var cube_verts = cube_arrays[Mesh.ARRAY_VERTEX]
-	var cube_indices = cube_arrays[Mesh.ARRAY_INDEX]
-	
-	# Process voxels in batches
-	var keys = current_voxel_data.keys()
-	var voxels_per_batch = 5000  # Adjust based on performance
-	
-	for batch_start in range(0, keys.size(), voxels_per_batch):
-		var batch_end = min(batch_start + voxels_per_batch, keys.size())
-		
-		# Process this batch
-		for i in range(batch_start, batch_end):
-			var key = keys[i]
-			var voxel = current_voxel_data[key]
-			var pos = voxel["position"]
-			
-			# Calculate world position
-			var world_pos = Vector3(
-				pos.x * voxel_size,
-				pos.y * voxel_size,
-				pos.z * voxel_size
-			) + model_aabb.position + Vector3(voxel_size/2, voxel_size/2, voxel_size/2)
-			
-			# Set color based on type
-			var color = Color(0.7, 0.7, 0.7, 0.7)  # Default
-			match voxel["type"]:
-				"metal":
-					color = Color(0.6, 0.6, 0.8, 0.7)
-				"armor":
-					color = Color(0.3, 0.3, 0.4, 0.7)
-				"turret":
-					color = Color(0.5, 0.5, 0.7, 0.7)
-				"glass":
-					color = Color(0.8, 0.9, 1.0, 0.5)
-				"engine":
-					color = Color(0.7, 0.3, 0.3, 0.7)
-			
-			# Add this voxel's vertices to the combined mesh
-			for v in cube_verts:
-				st.set_color(color)
-				st.add_vertex(v + world_pos)
-			
-			# Add indices for this voxel
-			for idx in cube_indices:
-				st.add_index(idx + i * cube_verts.size())
-		
-		# Update status
-		var percentage = (float(batch_end) / keys.size()) * 100.0
-		status_label.text = "Creating optimized preview: %.1f%% complete" % percentage
-		await get_tree().process_frame
-	
-	# Create the combined mesh
-	var combined_mesh = st.commit()
-	
-	# Create and add the mesh instance
-	var combined_instance = MeshInstance3D.new()
-	combined_instance.mesh = combined_mesh
-	
-	# Apply material
-	var material = StandardMaterial3D.new()
-	material.flags_transparent = true
-	material.vertex_color_use_as_albedo = true
-	combined_instance.material_override = material
-	
-	# Add to scene
-	preview_voxels = Node3D.new()
-	preview_voxels.name = "OptimizedPreviewVoxels"
-	preview_voxels.add_child(combined_instance)
-	preview_container.add_child(preview_voxels)
-	
-	status_label.text = "Optimized preview created with " + str(keys.size()) + " voxels"
