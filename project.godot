@@ -24,6 +24,14 @@ LocationManager="*res://scripts/autoload/LocationManager.gd"
 Logger="*res://scripts/autoload/Logger.gd"
 SignalBus="*res://scripts/autoload/SignalBus.gd"
 
+[file_customization]
+
+folder_colors={
+"res://assets/": "yellow",
+"res://scenes/": "green",
+"res://scripts/": "blue"
+}
+
 [input]
 
 ui_cancel={

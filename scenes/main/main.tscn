@@ -12,7 +12,8 @@ voxel_size = 2.0
 
 [node name="PlayerVehicle" type="CharacterBody3D" parent="."]
 script = ExtResource("2_6q06x")
-voxel_model_path = "res://assets/models/vehicles/tank_model_voxels_medium.tres"
+voxel_model_path = "res://assets/models/vehicles/Car_voxels_medium.tres"
+voxel_size = 1.0
 
 [node name="SpringArm3D" type="SpringArm3D" parent="PlayerVehicle"]
 transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 2, 0)
@@ -20,7 +21,7 @@ spring_length = 8.0
 margin = 0.5
 
 [node name="Camera3D" type="Camera3D" parent="PlayerVehicle/SpringArm3D"]
-transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 1.08429, 1.74226)
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 143.056, 128.549, 60.5376)
 current = true
 fov = 45.0
 far = 300.0

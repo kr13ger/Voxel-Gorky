@@ -1,0 +1,600 @@
+[gd_scene load_steps=2 format=3 uid="uid://dgttkuliiqw7u"]
+
+[ext_resource type="Script" uid="uid://n1fwqxi61ffn" path="res://scripts/tools/ModelImporter.gd" id="1_d7x4m"]
+
+[node name="ModelImporterEnhanced" type="Node3D"]
+script = ExtResource("1_d7x4m")
+model_path = "res://assets/models/vehicles/tank_model_2.obj"
+voxel_size = 1.0
+detail_level = 1
+adaptive_resolution = true
+
+[node name="ModelContainer" type="Node3D" parent="."]
+
+[node name="GridContainer" type="Node3D" parent="."]
+
+[node name="PreviewContainer" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 10, 15)
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, 0.5, -0.5, 0, 0.707107, 0.707107, 0.707107, -0.5, 0.5, 0, 10, 0)
+shadow_enabled = true
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ParametersPanel" type="Panel" parent="UI"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -400.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ParametersPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="UI/ParametersPanel/VBoxContainer"]
+layout_mode = 2
+text = "Model Voxelizer Settings"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="UI/ParametersPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="UI/ParametersPanel/VBoxContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="VoxelSizeLabel" type="Label" parent="UI/ParametersPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Voxel Size:"
+
+[node name="VoxelSizeSlider" type="HSlider" parent="UI/ParametersPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.1
+max_value = 2.0
+step = 0.1
+value = 0.5
+
+[node name="DetailLabel" type="Label" parent="UI/ParametersPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Detail Level:"
+
+[node name="DetailOptions" type="OptionButton" parent="UI/ParametersPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+selected = 1
+item_count = 3
+popup/item_0/text = "Low"
+popup/item_0/id = 0
+popup/item_1/text = "Medium"
+popup/item_1/id = 1
+popup/item_2/text = "High"
+popup/item_2/id = 2
+
+[node name="AdaptiveLabel" type="Label" parent="UI/ParametersPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Adaptive Resolution:"
+
+[node name="AdaptiveCheck" type="CheckBox" parent="UI/ParametersPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+button_pressed = true
+
+[node name="ModelLabel" type="Label" parent="UI/ParametersPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Model Path:"
+
+[node name="ModelPath" type="LineEdit" parent="UI/ParametersPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "res://assets/models/vehicles/tank_model.obj"
+placeholder_text = "Path to model"
+
+[node name="HSeparator2" type="HSeparator" parent="UI/ParametersPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="LoadModelButton" type="Button" parent="UI/ParametersPanel/VBoxContainer"]
+layout_mode = 2
+text = "Load Model"
+
+[node name="BrowseModelButton" type="Button" parent="UI/ParametersPanel/VBoxContainer"]
+layout_mode = 2
+text = "Browse Model File..."
+
+[node name="EditRegionsButton" type="Button" parent="UI/ParametersPanel/VBoxContainer"]
+layout_mode = 2
+text = "Edit Material Regions"
+
+[node name="PreviewButton" type="Button" parent="UI/ParametersPanel/VBoxContainer"]
+layout_mode = 2
+text = "Generate Preview"
+
+[node name="SaveButton" type="Button" parent="UI/ParametersPanel/VBoxContainer"]
+layout_mode = 2
+text = "Save Voxel Model"
+
+[node name="QuitButton" type="Button" parent="UI/ParametersPanel/VBoxContainer"]
+layout_mode = 2
+text = "Quit"
+
+[node name="StatusPanel" type="Panel" parent="UI"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -60.0
+offset_right = 400.0
+grow_vertical = 0
+
+[node name="StatusLabel" type="Label" parent="UI/StatusPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Ready"
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="ViewControls" type="Panel" parent="UI"]
+layout_mode = 0
+offset_right = 150.0
+offset_bottom = 150.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ViewControls"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="UI/ViewControls/VBoxContainer"]
+layout_mode = 2
+text = "View Controls"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="UI/ViewControls/VBoxContainer"]
+layout_mode = 2
+
+[node name="ShowModelCheck" type="CheckBox" parent="UI/ViewControls/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Show Model"
+
+[node name="ShowGridCheck" type="CheckBox" parent="UI/ViewControls/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Show Grid"
+
+[node name="ShowPreviewCheck" type="CheckBox" parent="UI/ViewControls/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Show Preview"
+
+[node name="ShowRegionsCheck" type="CheckBox" parent="UI/ViewControls/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Show Material Regions"
+
+[node name="AutoRotateCheck" type="CheckBox" parent="UI/ViewControls/VBoxContainer"]
+layout_mode = 2
+text = "Auto Rotate"
+
+[node name="CameraInfo" type="Label" parent="UI/ViewControls/VBoxContainer"]
+layout_mode = 2
+text = "Middle-click: orbit
+Wheel: zoom"
+
+[node name="FileDialog" type="FileDialog" parent="UI"]
+title = "Open a File"
+position = Vector2i(50, 50)
+size = Vector2i(600, 400)
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.obj", "*.glb", "*.gltf", "*.dae", "*.fbx")
+
+[node name="MaterialRegionsDialog" type="Window" parent="UI"]
+title = "Edit Material Regions"
+position = Vector2i(100, 100)
+size = Vector2i(800, 600)
+exclusive = true
+unresizable = true
+theme_override_constants/title_height = 30
+theme_override_font_sizes/title_font_size = 16
+
+[node name="Panel" type="Panel" parent="UI/MaterialRegionsDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MaterialRegionsDialog/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Define Regions for Different Materials"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="RegionsTabContainer" type="TabContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Metal" type="TabBar" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer"]
+layout_mode = 2
+text = "Metal Region (Default)"
+horizontal_alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="MinPosLabel" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Min Position (X, Y, Z):"
+
+[node name="MinPosContainer" type="HBoxContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="XSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer/GridContainer/MinPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = -10.0
+suffix = "x"
+
+[node name="YSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer/GridContainer/MinPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = -10.0
+suffix = "y"
+
+[node name="ZSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer/GridContainer/MinPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = -10.0
+suffix = "z"
+
+[node name="MaxPosLabel" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Max Position (X, Y, Z):"
+
+[node name="MaxPosContainer" type="HBoxContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="XSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer/GridContainer/MaxPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = 10.0
+suffix = "x"
+
+[node name="YSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer/GridContainer/MaxPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = 10.0
+suffix = "y"
+
+[node name="ZSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer/GridContainer/MaxPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = 10.0
+suffix = "z"
+
+[node name="ColorLabel" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Preview Color:"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer/GridContainer"]
+layout_mode = 2
+color = Color(0.6, 0.6, 0.8, 0.4)
+
+[node name="InfoLabel" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Metal/VBoxContainer"]
+layout_mode = 2
+text = "Note: Adjust the min/max positions to define the region bounds. 
+All voxels within this region will be assigned the Metal material type."
+autowrap_mode = 3
+
+[node name="Armor" type="TabBar" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer"]
+layout_mode = 2
+text = "Armor Region"
+horizontal_alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="MinPosLabel" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Min Position (X, Y, Z):"
+
+[node name="MinPosContainer" type="HBoxContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="XSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer/GridContainer/MinPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = -10.0
+suffix = "x"
+
+[node name="YSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer/GridContainer/MinPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = -10.0
+suffix = "y"
+
+[node name="ZSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer/GridContainer/MinPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = -10.0
+suffix = "z"
+
+[node name="MaxPosLabel" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Max Position (X, Y, Z):"
+
+[node name="MaxPosContainer" type="HBoxContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="XSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer/GridContainer/MaxPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = 10.0
+suffix = "x"
+
+[node name="YSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer/GridContainer/MaxPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = 3.0
+suffix = "y"
+
+[node name="ZSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer/GridContainer/MaxPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = 10.0
+suffix = "z"
+
+[node name="ColorLabel" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Preview Color:"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer/GridContainer"]
+layout_mode = 2
+color = Color(0.3, 0.3, 0.4, 0.4)
+
+[node name="InfoLabel" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Armor/VBoxContainer"]
+layout_mode = 2
+text = "Note: Armor has higher durability (80) compared to standard metal (50)."
+autowrap_mode = 3
+
+[node name="Turret" type="TabBar" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer"]
+layout_mode = 2
+text = "Turret Region"
+horizontal_alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="MinPosLabel" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Min Position (X, Y, Z):"
+
+[node name="MinPosContainer" type="HBoxContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="XSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer/GridContainer/MinPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = -5.0
+suffix = "x"
+
+[node name="YSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer/GridContainer/MinPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = 5.0
+suffix = "y"
+
+[node name="ZSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer/GridContainer/MinPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = -5.0
+suffix = "z"
+
+[node name="MaxPosLabel" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Max Position (X, Y, Z):"
+
+[node name="MaxPosContainer" type="HBoxContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="XSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer/GridContainer/MaxPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = 5.0
+suffix = "x"
+
+[node name="YSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer/GridContainer/MaxPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = 10.0
+suffix = "y"
+
+[node name="ZSpin" type="SpinBox" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer/GridContainer/MaxPosContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100.0
+step = 0.1
+value = 5.0
+suffix = "z"
+
+[node name="ColorLabel" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Preview Color:"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer/GridContainer"]
+layout_mode = 2
+color = Color(0.5, 0.5, 0.7, 0.4)
+
+[node name="InfoLabel" type="Label" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/RegionsTabContainer/Turret/VBoxContainer"]
+layout_mode = 2
+text = "Note: Turrets typically have medium durability (60) between metal and armor."
+autowrap_mode = 3
+
+[node name="AddMaterialButton" type="Button" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Add New Material Region"
+
+[node name="HSeparator2" type="HSeparator" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="ApplyButton" type="Button" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Apply"
+
+[node name="CloseButton" type="Button" parent="UI/MaterialRegionsDialog/Panel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Close"
+
+[node name="RegionsVisualizer" type="Node3D" parent="."]

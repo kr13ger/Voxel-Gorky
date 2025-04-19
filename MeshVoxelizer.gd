@@ -1,4 +1,4 @@
-# MeshVoxelizer.gd
+# scripts/tools/MeshVoxelizer.gd
 class_name MeshVoxelizer
 extends Node
 
@@ -140,11 +140,6 @@ func _voxelize_medium_detail(mesh: Mesh, grid_dimensions: Vector3i, aabb: AABB, 
 func _voxelize_high_detail(mesh: Mesh, grid_dimensions: Vector3i, aabb: AABB, material_map: Dictionary) -> void:
 	print("Using high detail voxelization mode...")
 	
-	# Get triangle faces from mesh for more accurate checks
-	var arrays = mesh.surface_get_arrays(0)
-	var vertices = arrays[Mesh.ARRAY_VERTEX]
-	var indices = arrays[Mesh.ARRAY_INDEX]
-	
 	# Initialize an array to track processed voxels
 	var processed_voxels = {}
 	
@@ -152,7 +147,7 @@ func _voxelize_high_detail(mesh: Mesh, grid_dimensions: Vector3i, aabb: AABB, ma
 	# We'll create smaller voxels near surfaces for better detail
 	for x in range(grid_dimensions.x):
 		# Print progress indicator every 10%
-		if x % int(grid_dimensions.x / 10) == 0:
+		if x % int(max(1, grid_dimensions.x / 10)) == 0:
 			var progress = float(x) / float(grid_dimensions.x) * 100.0
 			print("Voxelization progress: ", floor(progress), "%")
 		
