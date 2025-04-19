@@ -51,7 +51,7 @@ func voxelize_mesh(mesh: Mesh, material_map: Dictionary = {}) -> Dictionary:
 	
 	# Add thickness based on detail level
 	if detail_level >= 1:
-		_add_thickness(grid_dimensions, detail_level)
+		_add_thickness(grid_dimensions)
 	
 	# If voxelization failed or produced no voxels, use fallback shape
 	if voxel_data.is_empty():
@@ -434,78 +434,6 @@ func _add_thickness(grid_dimensions: Vector3i) -> void:
 	
 	var added = voxel_data.size() - original_count
 	print("Added ", added, " voxels for thickness.")
-	print("Adding thickness based on detail level ", detail, "...")
-	
-	# Create a list of original keys to avoid modifying while iterating
-	original_keys = voxel_data.keys()
-	original_count = original_keys.size()
-	
-	# Determine thickness based on detail level
-	var thickness = 1
-	if detail >= 2:  # High detail
-		thickness = 2
-	
-	# Add neighbors for each existing voxel
-	for key in original_keys:
-		var parts = key.split(",")
-		var x = int(parts[0])
-		var y = int(parts[1])
-		var z = int(parts[2])
-		
-		var voxel_type = voxel_data[key].type
-		
-		# Process neighbors within thickness range
-		for dx in range(-thickness, thickness+1):
-			for dy in range(-thickness, thickness+1):
-				for dz in range(-thickness, thickness+1):
-					# Skip the original voxel
-					if dx == 0 and dy == 0 and dz == 0:
-						continue
-					
-					# Calculate Manhattan distance
-					var distance = abs(dx) + abs(dy) + abs(dz)
-					
-					# Skip if too far based on detail level
-					if distance > thickness:
-						continue
-					
-					# Add more neighbor filtering based on detail
-					if detail < 2 and distance > 1:
-						# For low/medium detail, only add direct neighbors
-						continue
-					
-					# Calculate neighbor position
-					var nx = x + dx
-					var ny = y + dy
-					var nz = z + dz
-					
-					# Skip if out of bounds
-					if nx < 0 or nx >= grid_dimensions.x or \
-					   ny < 0 or ny >= grid_dimensions.y or \
-					   nz < 0 or nz >= grid_dimensions.z:
-						continue
-					
-					# Create neighbor key
-					var neighbor_key = "%d,%d,%d" % [nx, ny, nz]
-					
-					# Add if not already exists
-					if not voxel_data.has(neighbor_key):
-						voxel_data[neighbor_key] = {
-							"type": voxel_type,
-							"position": Vector3i(nx, ny, nz),
-							"health": get_voxel_health(voxel_type),
-							"instance": null
-						}
-					
-					# Check limit
-					if voxel_data.size() >= ABSOLUTE_MAX_VOXELS:
-						print("WARNING: Reached voxel limit while adding thickness.")
-						added = voxel_data.size() - original_count
-						print("Added ", added, " thickness voxels before limit.")
-						return
-	
-	added = voxel_data.size() - original_count
-	print("Added ", added, " thickness voxels.")
 
 # Fallback method to create a simple tank-like shape if the mesh processing fails
 func _create_basic_shape() -> Dictionary:

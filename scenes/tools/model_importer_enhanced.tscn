@@ -5,9 +5,7 @@
 [node name="ModelImporterEnhanced" type="Node3D"]
 script = ExtResource("1_d7x4m")
 model_path = "res://assets/models/vehicles/tank_model_2.obj"
-output_path = null
 voxel_size = 1.0
-use_fallback = null
 detail_level = 1
 adaptive_resolution = true
 

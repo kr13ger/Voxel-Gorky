@@ -7,6 +7,7 @@ extends Node3D
 @export_enum("Low", "Medium", "High") var detail_level: int = 0
 @export var adaptive_resolution: bool = false
 @export var debug_mode: bool = false
+@export var use_fallback: bool = false  # Added missing variable
 
 # UI references
 @onready var model_container = $ModelContainer
@@ -64,10 +65,15 @@ func _ready():
 	if not model_path.is_empty() and not use_fallback:
 		_load_model(model_path)
 	else:
-		_create_fallback_model_preview()
+		# Changed to properly handle the coroutine
+		call_deferred("_load_fallback_model")
 	
 	# Update camera position
 	_update_camera_position()
+
+# Deferred function to load fallback model after ready
+func _load_fallback_model():
+	await _create_fallback_model_preview()
 
 func _ensure_required_nodes():
 	# Make sure all required container nodes exist
@@ -439,7 +445,8 @@ func create_voxel_preview():
 		mesh_resource = loaded_model.mesh
 	else:
 		# If no model is loaded, use fallback
-		return _create_fallback_model_preview()
+		# This is an async function, so we need proper await
+		return await _create_fallback_model_preview()
 	
 	status_label.text = "Generating voxels... (this may take a moment)"
 	
