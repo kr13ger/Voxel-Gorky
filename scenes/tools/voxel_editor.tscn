@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://be2gx5oyy7t0i"]
+[gd_scene load_steps=13 format=3 uid="uid://be2gx5oyy7t0i"]
 
-[ext_resource type="Script" path="res://scripts/tools/VoxelEditor.gd" id="1"]
+[ext_resource type="Script" uid="uid://cnl3u3iisi6ym" path="res://scripts/tools/VoxelEditor.gd" id="1"]
 
 [sub_resource type="StandardMaterial3D" id="1"]
 albedo_color = Color(0.5, 0.5, 0.5, 0.3)
@@ -78,21 +78,14 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
-[sub_resource type="StyleBoxFlat" id="11"]
-bg_color = Color(0.101961, 0.101961, 0.101961, 0.784314)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-
 [sub_resource type="StandardMaterial3D" id="12"]
+transparency = 1
 albedo_color = Color(0.3, 0.7, 1, 0.5)
 metallic = 0.3
 roughness = 0.7
 emission_enabled = true
 emission = Color(0.3, 0.7, 1, 1)
 emission_energy_multiplier = 0.2
-transparency = 1
 
 [node name="VoxelEditor" type="Node3D"]
 script = ExtResource("1")
@@ -278,7 +271,6 @@ text = "Auto Rotate"
 layout_mode = 2
 text = "Middle-click: orbit
 Wheel: zoom"
-font_size = 12
 
 [node name="StatusPanel" type="Panel" parent="UI"]
 layout_mode = 1
@@ -315,9 +307,10 @@ theme_override_styles/panel = SubResource("10")
 
 [node name="FileDialog" type="FileDialog" parent="UI"]
 title = "Open a File"
-initial_position = 2
+position = Vector2i(100, 100)
 size = Vector2i(600, 400)
-theme_override_styles/panel = SubResource("11")
+visible = false
+always_on_top = true
 ok_button_text = "Open"
 file_mode = 0
 access = 2

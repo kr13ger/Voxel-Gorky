@@ -26,11 +26,28 @@ func _on_button_pressed():
 	# Open the voxel editor scene
 	var editor_scene = load("res://scenes/tools/voxel_editor.tscn")
 	if editor_scene:
-		var editor_instance = editor_scene.instantiate()
-		get_editor_interface().get_base_control().add_child(editor_instance)
+		# Create a window for the editor
+		var editor_window = Window.new()
+		editor_window.title = "Voxel Editor"
+		editor_window.size = Vector2i(1024, 768)
 		
-		# Make it modal
-		editor_instance.position = get_editor_interface().get_base_control().size / 2 - editor_instance.size / 2
+		# Calculate center position using proper type conversions
+		var viewport_size = get_editor_interface().get_base_control().get_viewport_rect().size
+		var window_size = Vector2(editor_window.size)
+		editor_window.position = Vector2i((viewport_size - window_size) / 2)
+		
+		editor_window.visible = false  # Set false initially
+		
+		# Instantiate the editor scene
+		var editor_instance = editor_scene.instantiate()
+		editor_window.add_child(editor_instance)
+		
+		# Add to interface and show
+		get_editor_interface().get_base_control().add_child(editor_window)
+		editor_window.popup_centered()
+		
+		# Connect close signal
+		editor_window.close_requested.connect(editor_window.queue_free)
 		
 		print("Opened Voxel Editor")
 	else:

@@ -2,11 +2,11 @@
 extends Node3D
 
 # References to important nodes
-@onready var voxel_container = $VoxelContainer
-@onready var selection_box = $UI/SelectionBox
-@onready var camera = $EditorCamera
-@onready var ui = $UI
-@onready var grid_visualizer = $GridVisualizer
+var voxel_container
+var selection_box
+var camera
+var ui
+var grid_visualizer
 
 # For tracking selection
 var selected_voxels = []
@@ -59,6 +59,11 @@ var move_start_positions = {}
 var move_grid_offset = Vector3i.ZERO
 
 func _ready():
+	print("VoxelEditor initializing...")
+	
+	# Initialize node references
+	_initialize_node_references()
+	
 	# Initialize UI
 	_setup_ui()
 	
@@ -73,38 +78,279 @@ func _ready():
 	
 	# Update UI states
 	_update_ui_states()
+	
+	print("VoxelEditor ready")
+
+func _initialize_node_references():
+	print("Initializing node references...")
+	
+	voxel_container = get_node_or_null("VoxelContainer")
+	if not voxel_container:
+		print("ERROR: VoxelContainer not found!")
+		return
+	
+	camera = get_node_or_null("EditorCamera")
+	if not camera:
+		print("ERROR: EditorCamera not found!")
+		return
+	
+	ui = get_node_or_null("UI")
+	if not ui:
+		print("ERROR: UI not found!")
+		return
+	
+	selection_box = ui.get_node_or_null("SelectionBox")
+	if not selection_box:
+		print("ERROR: SelectionBox not found!")
+	
+	grid_visualizer = get_node_or_null("GridVisualizer")
+	if not grid_visualizer:
+		print("ERROR: GridVisualizer not found!")
+	
+	print("Node references initialized successfully")
 
 func _setup_ui():
+	print("Setting up UI...")
+	
+	if not ui:
+		print("ERROR: Cannot setup UI - UI node is null!")
+		return
+	
+	# Connect Load Model button
+	var load_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/LoadModelButton")
+	if load_button:
+		print("Connecting Load Model button...")
+		load_button.pressed.connect(_on_load_model)
+		print("Load Model button connected")
+	else:
+		print("ERROR: Load Model button not found!")
+	
+	# Connect Save Model button
+	var save_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/SaveModelButton")
+	if save_button:
+		print("Connecting Save Model button...")
+		save_button.pressed.connect(_on_save_model)
+		print("Save Model button connected")
+	else:
+		print("ERROR: Save Model button not found!")
+	
 	# Set up color picker
-	ui.get_node("PropertyPanel/VBoxContainer/ColorPicker").color = current_color
-	ui.get_node("PropertyPanel/VBoxContainer/ColorPicker").color_changed.connect(_on_color_changed)
+	var color_picker = ui.get_node_or_null("PropertyPanel/VBoxContainer/ColorPicker")
+	if color_picker:
+		color_picker.color = current_color
+		color_picker.color_changed.connect(_on_color_changed)
+		print("Color picker setup complete")
+	else:
+		print("ERROR: Color picker not found!")
 	
 	# Set up material type dropdown
-	var material_option = ui.get_node("PropertyPanel/VBoxContainer/MaterialType")
-	for mat_type in material_types:
-		material_option.add_item(mat_type.capitalize())
-	material_option.item_selected.connect(_on_material_type_selected)
+	var material_option = ui.get_node_or_null("PropertyPanel/VBoxContainer/MaterialType")
+	if material_option:
+		for mat_type in material_types:
+			material_option.add_item(mat_type.capitalize())
+		material_option.item_selected.connect(_on_material_type_selected)
+		print("Material options setup complete")
+	else:
+		print("ERROR: Material option not found!")
 	
-	# Connect buttons
-	ui.get_node("PropertyPanel/VBoxContainer/ApplyButton").pressed.connect(_apply_to_selected)
-	ui.get_node("PropertyPanel/VBoxContainer/DeleteButton").pressed.connect(_delete_selected)
-	ui.get_node("PropertyPanel/VBoxContainer/AddVoxelButton").toggled.connect(_on_add_voxel_toggled)
-	ui.get_node("PropertyPanel/VBoxContainer/DuplicateButton").pressed.connect(_duplicate_selected)
-	ui.get_node("PropertyPanel/VBoxContainer/MoveButton").toggled.connect(_on_move_button_toggled)
-	ui.get_node("PropertyPanel/VBoxContainer/LoadModelButton").pressed.connect(_on_load_model)
-	ui.get_node("PropertyPanel/VBoxContainer/SaveModelButton").pressed.connect(_on_save_model)
+	# Connect other buttons
+	var apply_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/ApplyButton")
+	if apply_button:
+		apply_button.pressed.connect(_apply_to_selected)
 	
-	# Connect undo/redo
-	ui.get_node("PropertyPanel/VBoxContainer/UndoButton").pressed.connect(_on_undo)
-	ui.get_node("PropertyPanel/VBoxContainer/RedoButton").pressed.connect(_on_redo)
+	var delete_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/DeleteButton")
+	if delete_button:
+		delete_button.pressed.connect(_delete_selected)
+	
+	var add_voxel_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/AddVoxelButton")
+	if add_voxel_button:
+		add_voxel_button.toggled.connect(_on_add_voxel_toggled)
+	
+	var duplicate_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/DuplicateButton")
+	if duplicate_button:
+		duplicate_button.pressed.connect(_duplicate_selected)
+	
+	var move_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/MoveButton")
+	if move_button:
+		move_button.toggled.connect(_on_move_button_toggled)
+	
+	var undo_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/UndoButton")
+	if undo_button:
+		undo_button.pressed.connect(_on_undo)
+	
+	var redo_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/RedoButton")
+	if redo_button:
+		redo_button.pressed.connect(_on_redo)
 	
 	# Connect file dialog
-	ui.get_node("FileDialog").file_selected.connect(_on_file_dialog_selected)
+	var file_dialog = ui.get_node_or_null("FileDialog")
+	if file_dialog:
+		file_dialog.file_selected.connect(_on_file_dialog_selected)
+		print("FileDialog connected successfully")
+	else:
+		print("ERROR: FileDialog not found!")
 	
 	# Connect view controls
-	ui.get_node("ViewControls/VBoxContainer/ShowGridCheck").toggled.connect(_on_show_grid_toggled)
-	ui.get_node("ViewControls/VBoxContainer/ShowWireframeCheck").toggled.connect(_on_show_wireframe_toggled)
-	ui.get_node("ViewControls/VBoxContainer/AutoRotateCheck").toggled.connect(_on_auto_rotate_toggled)
+	var show_grid_check = ui.get_node_or_null("ViewControls/VBoxContainer/ShowGridCheck")
+	if show_grid_check:
+		show_grid_check.toggled.connect(_on_show_grid_toggled)
+	
+	var show_wireframe_check = ui.get_node_or_null("ViewControls/VBoxContainer/ShowWireframeCheck")
+	if show_wireframe_check:
+		show_wireframe_check.toggled.connect(_on_show_wireframe_toggled)
+	
+	var auto_rotate_check = ui.get_node_or_null("ViewControls/VBoxContainer/AutoRotateCheck")
+	if auto_rotate_check:
+		auto_rotate_check.toggled.connect(_on_auto_rotate_toggled)
+	
+	print("UI setup complete")
+
+func _on_load_model():
+	print("Load Model button was clicked!")
+	
+	if not ui:
+		print("ERROR: UI is null!")
+		return
+	
+	# Create a new FileDialog to ensure it works
+	var dialog = FileDialog.new()
+	dialog.title = "Open Voxel Model"
+	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
+	dialog.filters = PackedStringArray(["*.tres ; Voxel Resources"])
+	dialog.access = FileDialog.ACCESS_RESOURCES
+	dialog.size = Vector2i(600, 400)
+	
+	# Make it a popup
+	dialog.initial_position = Window.WINDOW_INITIAL_POSITION_CENTER_MAIN_WINDOW_SCREEN
+	
+	# Connect signals
+	dialog.file_selected.connect(_on_file_dialog_selected)
+	dialog.canceled.connect(func(): dialog.queue_free())
+	dialog.close_requested.connect(func(): dialog.queue_free())
+	
+	# Add to scene
+	add_child(dialog)
+	
+	# Show the dialog
+	dialog.popup_centered()
+	
+	print("FileDialog created and shown")
+
+func _on_save_model():
+	print("Save Model button was clicked!")
+	
+	if not ui:
+		print("ERROR: UI is null!")
+		return
+	
+	if current_voxel_data.is_empty():
+		var status_label = ui.get_node_or_null("StatusPanel/StatusLabel")
+		if status_label:
+			status_label.text = "No voxel data to save"
+		return
+	
+	# Create a new save dialog
+	var dialog = FileDialog.new()
+	dialog.title = "Save Voxel Model"
+	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
+	dialog.filters = PackedStringArray(["*.tres ; Voxel Resources"])
+	dialog.access = FileDialog.ACCESS_RESOURCES
+	dialog.size = Vector2i(600, 400)
+	
+	# Set initial filename if we have one
+	if not loaded_model_path.is_empty():
+		dialog.current_file = loaded_model_path.get_file()
+	else:
+		dialog.current_file = "voxel_model.tres"
+	
+	# Make it a popup
+	dialog.initial_position = Window.WINDOW_INITIAL_POSITION_CENTER_MAIN_WINDOW_SCREEN
+	
+	# Connect signals
+	dialog.file_selected.connect(_on_save_file_dialog_selected)
+	dialog.canceled.connect(func(): dialog.queue_free())
+	dialog.close_requested.connect(func(): dialog.queue_free())
+	
+	# Add to scene
+	add_child(dialog)
+	
+	# Show the dialog
+	dialog.popup_centered()
+	
+	print("Save dialog created and shown")
+
+func _on_save_file_dialog_selected(path):
+	print("Save file selected: ", path)
+	_save_model_to_path(path)
+
+func _on_file_dialog_selected(path):
+	print("File selected: ", path)
+	load_voxel_model(path)
+
+func load_voxel_model(model_path):
+	print("Loading voxel model: ", model_path)
+	
+	# Clear existing voxel container
+	for child in voxel_container.get_children():
+		child.queue_free()
+	
+	selected_voxels.clear()
+	
+	# Load the voxel resource
+	if not ResourceLoader.exists(model_path):
+		if ui and ui.has_node("StatusPanel/StatusLabel"):
+			ui.get_node("StatusPanel/StatusLabel").text = "Voxel model not found: " + model_path
+		return false
+	
+	var resource = ResourceLoader.load(model_path)
+	if not resource or not resource.has_meta("voxel_data"):
+		if ui and ui.has_node("StatusPanel/StatusLabel"):
+			ui.get_node("StatusPanel/StatusLabel").text = "Invalid voxel resource - missing 'voxel_data' meta"
+		return false
+	
+	# Get data and size
+	current_voxel_data = resource.get_meta("voxel_data")
+	if resource.has_meta("voxel_size"):
+		voxel_size = resource.get_meta("voxel_size")
+	
+	# Create visual voxels
+	_create_voxel_meshes()
+	
+	# Update UI
+	if ui and ui.has_node("StatusPanel/StatusLabel"):
+		ui.get_node("StatusPanel/StatusLabel").text = "Loaded model with " + str(current_voxel_data.size()) + " voxels"
+	loaded_model_path = model_path
+	
+	# Reset history
+	history.clear()
+	history_index = -1
+	_add_to_history("load")
+	
+	# Update grid
+	_create_grid_visualization()
+	
+	# Update ghost voxel size
+	_update_ghost_voxel_size()
+	
+	return true
+
+func _save_model_to_path(path):
+	# Create a resource to save
+	var resource = Resource.new()
+	resource.set_meta("voxel_data", current_voxel_data)
+	resource.set_meta("voxel_size", voxel_size)
+	
+	# Save the resource
+	var err = ResourceSaver.save(resource, path)
+	if err == OK:
+		if ui and ui.has_node("StatusPanel/StatusLabel"):
+			ui.get_node("StatusPanel/StatusLabel").text = "Model saved to " + path
+		loaded_model_path = path
+	else:
+		if ui and ui.has_node("StatusPanel/StatusLabel"):
+			ui.get_node("StatusPanel/StatusLabel").text = "Error saving model: " + str(err)
+# Include all other functions from the original script...
+# (I've focused on the file dialog related functions for brevity, but all other functions remain the same)
 
 func _setup_selection_box():
 	selection_box.visible = false
@@ -172,48 +418,6 @@ func _create_ghost_voxel():
 	
 	add_child(ghost_voxel)
 	ghost_voxel.visible = false
-
-func load_voxel_model(model_path):
-	# Clear existing voxel container
-	for child in voxel_container.get_children():
-		child.queue_free()
-	
-	selected_voxels.clear()
-	
-	# Load the voxel resource
-	if not ResourceLoader.exists(model_path):
-		ui.get_node("StatusPanel/StatusLabel").text = "Voxel model not found: " + model_path
-		return false
-	
-	var resource = ResourceLoader.load(model_path)
-	if not resource or not resource.has_meta("voxel_data"):
-		ui.get_node("StatusPanel/StatusLabel").text = "Invalid voxel resource - missing 'voxel_data' meta"
-		return false
-	
-	# Get data and size
-	current_voxel_data = resource.get_meta("voxel_data")
-	if resource.has_meta("voxel_size"):
-		voxel_size = resource.get_meta("voxel_size")
-	
-	# Create visual voxels
-	_create_voxel_meshes()
-	
-	# Update UI
-	ui.get_node("StatusPanel/StatusLabel").text = "Loaded model with " + str(current_voxel_data.size()) + " voxels"
-	loaded_model_path = model_path
-	
-	# Reset history
-	history.clear()
-	history_index = -1
-	_add_to_history("load")
-	
-	# Update grid
-	_create_grid_visualization()
-	
-	# Update ghost voxel size
-	_update_ghost_voxel_size()
-	
-	return true
 
 func _create_voxel_meshes():
 	# Create visual representation for each voxel
@@ -840,46 +1044,6 @@ func _on_show_wireframe_toggled(toggled):
 func _on_auto_rotate_toggled(toggled):
 	if not toggled:
 		ui.get_node("StatusPanel/StatusLabel").text = "Auto-rotate disabled"
-
-func _on_load_model():
-	ui.get_node("FileDialog").file_mode = FileDialog.FILE_MODE_OPEN_FILE
-	ui.get_node("FileDialog").filters = PackedStringArray(["*.tres ; Voxel Resources"])
-	ui.get_node("FileDialog").popup_centered()
-
-func _on_save_model():
-	if current_voxel_data.is_empty():
-		ui.get_node("StatusPanel/StatusLabel").text = "No voxel data to save"
-		return
-	
-	var save_path = loaded_model_path
-	
-	if save_path.is_empty():
-		ui.get_node("FileDialog").file_mode = FileDialog.FILE_MODE_SAVE_FILE
-		ui.get_node("FileDialog").filters = PackedStringArray(["*.tres ; Voxel Resources"])
-		ui.get_node("FileDialog").popup_centered()
-		return
-	
-	_save_model_to_path(save_path)
-
-func _on_file_dialog_selected(path):
-	if ui.get_node("FileDialog").file_mode == FileDialog.FILE_MODE_OPEN_FILE:
-		load_voxel_model(path)
-	else:
-		_save_model_to_path(path)
-
-func _save_model_to_path(path):
-	# Create a resource to save
-	var resource = Resource.new()
-	resource.set_meta("voxel_data", current_voxel_data)
-	resource.set_meta("voxel_size", voxel_size)
-	
-	# Save the resource
-	var err = ResourceSaver.save(resource, path)
-	if err == OK:
-		ui.get_node("StatusPanel/StatusLabel").text = "Model saved to " + path
-		loaded_model_path = path
-	else:
-		ui.get_node("StatusPanel/StatusLabel").text = "Error saving model: " + str(err)
 
 # History operations
 func _add_to_history(operation_type):
