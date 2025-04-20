@@ -24,6 +24,10 @@ LocationManager="*res://scripts/autoload/LocationManager.gd"
 Logger="*res://scripts/autoload/Logger.gd"
 SignalBus="*res://scripts/autoload/SignalBus.gd"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/voxel_editor/plugin.cfg")
+
 [file_customization]
 
 folder_colors={

@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://dbbfpfqt4sode" path="res://ui/UI.gd" id="3_6q06x"]
 
 [node name="Main" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 15.942)
 script = ExtResource("1_hujxm")
 environment_size = Vector3(100, 10, 100)
 voxel_size = 2.0

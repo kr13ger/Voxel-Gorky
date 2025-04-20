@@ -1,0 +1,13 @@
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <!-- Grid background -->
+  <rect x="0" y="0" width="16" height="16" fill="#2C3E50" rx="2" ry="2"/>
+  
+  <!-- Voxels -->
+  <rect x="3" y="3" width="4" height="4" fill="#2980B9" stroke="#3498DB" stroke-width="0.5"/>
+  <rect x="7" y="3" width="4" height="4" fill="#E74C3C" stroke="#F5B7B1" stroke-width="0.5"/>
+  <rect x="9" y="9" width="4" height="4" fill="#27AE60" stroke="#2ECC71" stroke-width="0.5"/>
+  <rect x="5" y="7" width="4" height="4" fill="#F1C40F" stroke="#F9E79F" stroke-width="0.5"/>
+  
+  <!-- Outline -->
+  <rect x="0.5" y="0.5" width="15" height="15" fill="none" stroke="#ECF0F1" stroke-width="0.5" rx="2" ry="2"/>
+</svg>
