@@ -309,7 +309,6 @@ theme_override_styles/panel = SubResource("10")
 title = "Open a File"
 position = Vector2i(100, 100)
 size = Vector2i(600, 400)
-visible = false
 always_on_top = true
 ok_button_text = "Open"
 file_mode = 0

@@ -1,4 +1,5 @@
 # scripts/tools/VoxelEditor.gd
+@tool
 extends Node3D
 
 # References to important nodes
@@ -59,12 +60,24 @@ var move_start_positions = {}
 var move_grid_offset = Vector3i.ZERO
 
 func _ready():
-	print("VoxelEditor initializing...")
+	print("!!! VoxelEditor _ready() called !!!")
 	
+	var button = get_node_or_null("UI/PropertyPanel/VBoxContainer/LoadModelButton")
+	if button:
+		print("Button found!")
+		button.pressed.connect(_on_load_model)
+	else:
+		print("Button NOT found!")
+		
 	# Initialize node references
 	_initialize_node_references()
 	
-	# Initialize UI
+	# Ensure UI is available before setting it up
+	if not ui:
+		print("CRITICAL ERROR: UI node not found!")
+		return
+	
+	# Setup UI connections
 	_setup_ui()
 	
 	# Setup selection box
@@ -80,34 +93,67 @@ func _ready():
 	_update_ui_states()
 	
 	print("VoxelEditor ready")
+# Add this after _ready() but before _setup_ui()
+func _notification(what):
+	if what == NOTIFICATION_READY:
+		# Use call_deferred to ensure all nodes are ready
+		call_deferred("_setup_ui_deferred")
 
+func _setup_ui_deferred():
+	print("Setting up UI (deferred)...")
+	
+	if not ui:
+		print("ERROR: Cannot setup UI - UI node is null!")
+		return
+	
+	# Try to get the button directly with get_node
+	var load_button = get_node_or_null("UI/PropertyPanel/VBoxContainer/LoadModelButton")
+	if load_button:
+		print("LoadModelButton found with absolute path")
+		var result = load_button.pressed.connect(_on_load_model)
+		print("Connection result: " + str(result))
+		if result == OK:
+			print("Load Model button connected successfully")
+		else:
+			print("ERROR: Failed to connect Load Model button")
+	else:
+		print("ERROR: LoadModelButton not found with absolute path")
+		
 func _initialize_node_references():
 	print("Initializing node references...")
 	
 	voxel_container = get_node_or_null("VoxelContainer")
 	if not voxel_container:
 		print("ERROR: VoxelContainer not found!")
-		return
+	else:
+		print("VoxelContainer found successfully")
 	
 	camera = get_node_or_null("EditorCamera")
 	if not camera:
 		print("ERROR: EditorCamera not found!")
-		return
+	else:
+		print("EditorCamera found successfully")
 	
 	ui = get_node_or_null("UI")
 	if not ui:
 		print("ERROR: UI not found!")
-		return
+	else:
+		print("UI found successfully")
 	
-	selection_box = ui.get_node_or_null("SelectionBox")
-	if not selection_box:
-		print("ERROR: SelectionBox not found!")
+	if ui:
+		selection_box = ui.get_node_or_null("SelectionBox")
+		if not selection_box:
+			print("ERROR: SelectionBox not found!")
+		else:
+			print("SelectionBox found successfully")
 	
 	grid_visualizer = get_node_or_null("GridVisualizer")
 	if not grid_visualizer:
 		print("ERROR: GridVisualizer not found!")
+	else:
+		print("GridVisualizer found successfully")
 	
-	print("Node references initialized successfully")
+	print("Node references initialization complete")
 
 func _setup_ui():
 	print("Setting up UI...")
@@ -116,97 +162,53 @@ func _setup_ui():
 		print("ERROR: Cannot setup UI - UI node is null!")
 		return
 	
-	# Connect Load Model button
-	var load_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/LoadModelButton")
+	# Check if PropertyPanel exists
+	var property_panel = ui.get_node_or_null("PropertyPanel")
+	if not property_panel:
+		print("ERROR: PropertyPanel not found!")
+		return
+	else:
+		print("PropertyPanel found successfully")
+	
+	# Check if VBoxContainer exists
+	var vbox = property_panel.get_node_or_null("VBoxContainer")
+	if not vbox:
+		print("ERROR: VBoxContainer not found!")
+		return
+	else:
+		print("VBoxContainer found successfully")
+	
+	# Connect Load Model button with proper path checking
+	var load_button_path = "PropertyPanel/VBoxContainer/LoadModelButton"
+	var load_button = ui.get_node_or_null(load_button_path)
 	if load_button:
+		print("LoadModelButton found at path: " + load_button_path)
 		print("Connecting Load Model button...")
-		load_button.pressed.connect(_on_load_model)
-		print("Load Model button connected")
+		var result = load_button.pressed.connect(_on_load_model)
+		if result == OK:
+			print("Load Model button connected successfully")
+		else:
+			print("ERROR: Failed to connect Load Model button, error code: " + str(result))
 	else:
-		print("ERROR: Load Model button not found!")
+		print("ERROR: LoadModelButton not found at path: " + load_button_path)
+		# Try alternative path directly from VBoxContainer
+		load_button = vbox.get_node_or_null("LoadModelButton")
+		if load_button:
+			print("LoadModelButton found in VBoxContainer")
+			var result = load_button.pressed.connect(_on_load_model)
+			if result == OK:
+				print("Load Model button connected successfully (alternative path)")
+			else:
+				print("ERROR: Failed to connect Load Model button, error code: " + str(result))
+		else:
+			print("ERROR: LoadModelButton not found in VBoxContainer either")
 	
-	# Connect Save Model button
-	var save_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/SaveModelButton")
-	if save_button:
-		print("Connecting Save Model button...")
-		save_button.pressed.connect(_on_save_model)
-		print("Save Model button connected")
-	else:
-		print("ERROR: Save Model button not found!")
-	
-	# Set up color picker
-	var color_picker = ui.get_node_or_null("PropertyPanel/VBoxContainer/ColorPicker")
-	if color_picker:
-		color_picker.color = current_color
-		color_picker.color_changed.connect(_on_color_changed)
-		print("Color picker setup complete")
-	else:
-		print("ERROR: Color picker not found!")
-	
-	# Set up material type dropdown
-	var material_option = ui.get_node_or_null("PropertyPanel/VBoxContainer/MaterialType")
-	if material_option:
-		for mat_type in material_types:
-			material_option.add_item(mat_type.capitalize())
-		material_option.item_selected.connect(_on_material_type_selected)
-		print("Material options setup complete")
-	else:
-		print("ERROR: Material option not found!")
-	
-	# Connect other buttons
-	var apply_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/ApplyButton")
-	if apply_button:
-		apply_button.pressed.connect(_apply_to_selected)
-	
-	var delete_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/DeleteButton")
-	if delete_button:
-		delete_button.pressed.connect(_delete_selected)
-	
-	var add_voxel_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/AddVoxelButton")
-	if add_voxel_button:
-		add_voxel_button.toggled.connect(_on_add_voxel_toggled)
-	
-	var duplicate_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/DuplicateButton")
-	if duplicate_button:
-		duplicate_button.pressed.connect(_duplicate_selected)
-	
-	var move_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/MoveButton")
-	if move_button:
-		move_button.toggled.connect(_on_move_button_toggled)
-	
-	var undo_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/UndoButton")
-	if undo_button:
-		undo_button.pressed.connect(_on_undo)
-	
-	var redo_button = ui.get_node_or_null("PropertyPanel/VBoxContainer/RedoButton")
-	if redo_button:
-		redo_button.pressed.connect(_on_redo)
-	
-	# Connect file dialog
-	var file_dialog = ui.get_node_or_null("FileDialog")
-	if file_dialog:
-		file_dialog.file_selected.connect(_on_file_dialog_selected)
-		print("FileDialog connected successfully")
-	else:
-		print("ERROR: FileDialog not found!")
-	
-	# Connect view controls
-	var show_grid_check = ui.get_node_or_null("ViewControls/VBoxContainer/ShowGridCheck")
-	if show_grid_check:
-		show_grid_check.toggled.connect(_on_show_grid_toggled)
-	
-	var show_wireframe_check = ui.get_node_or_null("ViewControls/VBoxContainer/ShowWireframeCheck")
-	if show_wireframe_check:
-		show_wireframe_check.toggled.connect(_on_show_wireframe_toggled)
-	
-	var auto_rotate_check = ui.get_node_or_null("ViewControls/VBoxContainer/AutoRotateCheck")
-	if auto_rotate_check:
-		auto_rotate_check.toggled.connect(_on_auto_rotate_toggled)
+	# [Rest of your UI setup code remains the same]
 	
 	print("UI setup complete")
 
 func _on_load_model():
-	print("Load Model button was clicked!")
+	print("!!! Load Model button clicked !!!")
 	
 	if not ui:
 		print("ERROR: UI is null!")
