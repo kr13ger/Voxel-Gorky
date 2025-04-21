@@ -19,7 +19,7 @@ var move_grid_offset = Vector3i.ZERO
 var voxel_size: float = 1.0
 
 # Debugging helpers
-var debug_mode = false
+var debug_mode = true
 
 func setup_selection(box: Panel, cam: Camera3D, container: Node3D):
 	selection_box = box
@@ -29,6 +29,12 @@ func setup_selection(box: Panel, cam: Camera3D, container: Node3D):
 	# Make sure the selection box is hidden initially
 	if selection_box:
 		selection_box.visible = false
+		
+	if debug_mode:
+		print("VoxelEditorSelection: Setup completed")
+		print("- Selection box: ", "Valid" if selection_box else "Invalid")
+		print("- Camera: ", "Valid" if camera else "Invalid")
+		print("- Voxel container: ", "Valid" if voxel_container else "Invalid")
 
 func _input(event):
 	if not camera or not selection_box:
@@ -47,6 +53,8 @@ func _input(event):
 				elif drag_mode == "select":
 					# If not holding shift, clear selection
 					if not Input.is_key_pressed(KEY_SHIFT):
+						if debug_mode:
+							print("Clearing selection on drag start (not holding shift)")
 						clear_selection()
 			else:
 				# End drag
@@ -101,6 +109,9 @@ func _process_selection_box():
 	if rect.size.length() < 5:
 		return
 	
+	if debug_mode:
+		print("Processing selection box with size: ", rect.size)
+	
 	# Select all voxels in the box
 	for voxel_mesh in voxel_container.get_children():
 		if voxel_mesh is MeshInstance3D:
@@ -108,13 +119,26 @@ func _process_selection_box():
 			if rect.has_point(screen_pos):
 				select_voxel(voxel_mesh)
 
+# FIXED: Improved voxel selection with better visual feedback and checks
 func select_voxel(voxel_mesh):
-	if not voxel_mesh or not voxel_mesh.has_meta("voxel_key"):
+	if not voxel_mesh:
+		if debug_mode:
+			print("Cannot select null voxel mesh")
+		return
+		
+	if not voxel_mesh.has_meta("voxel_key"):
+		if debug_mode:
+			print("Voxel mesh has no 'voxel_key' metadata: ", voxel_mesh.name)
 		return
 		
 	# Skip if already selected
 	if voxel_mesh in selected_voxels:
+		if debug_mode:
+			print("Voxel already selected: ", voxel_mesh.get_meta("voxel_key"))
 		return
+	
+	if debug_mode:
+		print("Selecting voxel: ", voxel_mesh.get_meta("voxel_key"))
 	
 	# Add to selection array
 	selected_voxels.append(voxel_mesh)
@@ -124,22 +148,34 @@ func select_voxel(voxel_mesh):
 	if material:
 		material = material.duplicate()
 		material.emission_enabled = true
-		material.emission = Color(0.3, 0.3, 0.3)
-		material.emission_energy = 0.5
+		material.emission = Color(0.3, 0.8, 0.3)  # Brighter green for better visibility
+		material.emission_energy_multiplier = 0.8  # Increased for better feedback
 		voxel_mesh.material_override = material
 	
 	# Emit signal
 	voxel_selected.emit(voxel_mesh)
+	
+	if debug_mode:
+		print("Selected voxels count: ", selected_voxels.size())
 
+# FIXED: Clear selection with better cleanup
 func clear_selection():
+	if debug_mode:
+		print("Clearing selection with ", selected_voxels.size(), " voxels")
+	
 	# Remove highlighting from all selected voxels
+	var valid_voxels = 0
 	for voxel_mesh in selected_voxels:
 		if is_instance_valid(voxel_mesh):
+			valid_voxels += 1
 			var material = voxel_mesh.material_override
 			if material:
 				material = material.duplicate()
 				material.emission_enabled = false
 				voxel_mesh.material_override = material
+	
+	if debug_mode and valid_voxels < selected_voxels.size():
+		print("Warning: Some selected voxels are no longer valid (", selected_voxels.size() - valid_voxels, " invalid)")
 	
 	# Clear the array
 	selected_voxels.clear()

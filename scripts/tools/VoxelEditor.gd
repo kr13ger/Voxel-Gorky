@@ -22,6 +22,7 @@ var current_voxel_data = {}
 var voxel_size = 1.0
 var current_color = Color(0.6, 0.6, 0.8)
 var current_material_type = "metal"
+var debug_mode = true  # Enable for debugging output
 
 func _ready():
 	print("VoxelEditor initializing...")
@@ -106,12 +107,18 @@ func _initialize_components():
 	add_child(file_manager)
 	file_manager.setup_file_manager(self, ui_root)
 
-# Set up selection for a voxel mesh
+# Set up selection for a voxel mesh - FIXED
 func _setup_voxel_selection(voxel_mesh):
+	if debug_mode:
+		print("Setting up selection for voxel: ", voxel_mesh.name)
+		
 	# Make sure each voxel has a working selection area
 	var area = voxel_mesh.get_node_or_null("SelectionArea")
 	
 	if not area:
+		if debug_mode:
+			print("Creating selection area for voxel")
+			
 		area = Area3D.new()
 		area.name = "SelectionArea"
 		
@@ -128,23 +135,41 @@ func _setup_voxel_selection(voxel_mesh):
 	area.monitoring = true
 	area.monitorable = true
 	
-	# Connect input event
-	if area.has_signal("input_event") and not area.is_connected("input_event", _on_voxel_input_event):
+	# FIX: Disconnect any existing connections to avoid duplicates
+	if area.has_signal("input_event"):
+		for connection in area.get_signal_connection_list("input_event"):
+			if connection.callable.get_object() == self:
+				area.disconnect("input_event", connection.callable)
+		
+		# Connect input event with the voxel_mesh as a parameter
 		area.connect("input_event", _on_voxel_input_event.bind(voxel_mesh))
+		
+		if debug_mode:
+			print("Connected input_event signal for voxel: ", voxel_mesh.name)
 
-# Handle input on voxels
-func _on_voxel_input_event(_camera, event, _clicked_pos, _normal, _shape_idx, voxel_mesh):
+# Handle input on voxels - FIXED
+func _on_voxel_input_event(camera, event, clicked_pos, normal, shape_idx, voxel_mesh):
+	if debug_mode:
+		print("Voxel input event detected on: ", voxel_mesh.name if voxel_mesh else "Unknown")
+		
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			if debug_mode:
+				print("Left click on voxel detected")
+				
 			# Select the voxel if not dragging for box selection
 			if selection and not selection.is_dragging:
 				if Input.is_key_pressed(KEY_SHIFT):
 					# Add to selection with shift
 					selection.select_voxel(voxel_mesh)
+					if debug_mode:
+						print("Added voxel to selection with shift")
 				else:
 					# Clear previous selection and select this one
 					selection.clear_selection()
 					selection.select_voxel(voxel_mesh)
+					if debug_mode:
+						print("Selected single voxel")
 
 func _connect_component_signals():
 	# Connect UI signals if UI is valid
@@ -211,8 +236,11 @@ func _connect_component_signals():
 		if file_manager.has_signal("model_saved"):
 			file_manager.connect("model_saved", _on_model_saved)
 
-# Custom implementation of operations
+# Custom implementation of operations - FIXED
 func _apply_to_selected():
+	if debug_mode:
+		print("_apply_to_selected called")
+		
 	if not selection or selection.selected_voxels.is_empty():
 		if ui:
 			ui.show_status("No voxels selected")
@@ -225,6 +253,9 @@ func _apply_to_selected():
 			var voxel_key = voxel_mesh.get_meta("voxel_key")
 			modified_keys.append(voxel_key)
 			
+			if debug_mode:
+				print("Applying changes to voxel: ", voxel_key)
+				
 			# Apply material type and color
 			if current_voxel_data.has(voxel_key):
 				current_voxel_data[voxel_key]["type"] = current_material_type
@@ -236,7 +267,7 @@ func _apply_to_selected():
 				# Add emission for selected effect
 				mat.emission_enabled = true
 				mat.emission = Color(0.3, 0.3, 0.3)
-				mat.emission_energy = 0.5
+				mat.emission_energy_multiplier = 0.5
 				
 				if current_material_type == "glass":
 					mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -252,7 +283,13 @@ func _apply_to_selected():
 	if ui:
 		ui.show_status("Applied changes to " + str(modified_keys.size()) + " voxels")
 
+# scripts/tools/VoxelEditor.gd
+# Fix focused only on the _delete_selected method to solve deletion issue
+
 func _delete_selected():
+	if debug_mode:
+		print("_delete_selected called - FIXED VERSION")
+		
 	if not selection or selection.selected_voxels.is_empty():
 		if ui:
 			ui.show_status("No voxels selected")
@@ -264,29 +301,77 @@ func _delete_selected():
 	# Create a copy of the array since we'll be modifying it
 	var selected_copy = selection.selected_voxels.duplicate()
 	
+	if debug_mode:
+		print("Selected voxels to delete: ", selected_copy.size())
+		for i in range(selected_copy.size()):
+			var voxel = selected_copy[i]
+			print("  Selected voxel #", i, ": ", voxel.name if voxel else "None", 
+				  ", Key: ", voxel.get_meta("voxel_key") if voxel and voxel.has_meta("voxel_key") else "No key")
+	
 	for voxel_mesh in selected_copy:
 		if voxel_mesh.has_meta("voxel_key"):
 			var voxel_key = voxel_mesh.get_meta("voxel_key")
 			deleted_keys.append(voxel_key)
 			
+			if debug_mode:
+				print("Processing deletion for voxel: ", voxel_key)
+				print("  Exists in data: ", current_voxel_data.has(voxel_key))
+				
 			if current_voxel_data.has(voxel_key):
+				# Actually remove it from the data structure
 				current_voxel_data.erase(voxel_key)
 				deleted_count += 1
+				
+				if debug_mode:
+					print("  Removed from voxel_data")
 			
 			# Remove from selection first
 			selection.selected_voxels.erase(voxel_mesh)
 			
-			# Delete the mesh
-			voxel_mesh.queue_free()
+			if debug_mode:
+				print("  Removed from selection")
+			
+			# Delete the mesh - ensure we use call_deferred to prevent issues
+			if is_instance_valid(voxel_mesh):
+				voxel_mesh.call_deferred("queue_free")
+				if debug_mode:
+					print("  Queued for deletion")
 	
 	if operations and operations.has_signal("voxel_deleted"):
+		if debug_mode:
+			print("Emitting voxel_deleted signal with ", deleted_keys.size(), " keys")
 		operations.emit_signal("voxel_deleted", {"type": "delete", "keys": deleted_keys})
+	
+	# Force refresh the visuals
+	if voxel_container:
+		# Verify that voxels were actually removed
+		var remaining_voxels = []
+		for child in voxel_container.get_children():
+			if child is MeshInstance3D:
+				remaining_voxels.append(child)
+				
+		if debug_mode:
+			print("Remaining voxels after deletion: ", remaining_voxels.size())
+			
+		# If any deleted voxels are still present, forcibly remove them
+		for voxel_key in deleted_keys:
+			for child in voxel_container.get_children():
+				if child is MeshInstance3D and child.has_meta("voxel_key") and child.get_meta("voxel_key") == voxel_key:
+					if debug_mode:
+						print("Force removing persistent voxel: ", voxel_key)
+					child.free()
 	
 	if ui:
 		ui.update_selection_count(selection.selected_voxels.size())
 		ui.show_status("Deleted " + str(deleted_count) + " voxels")
-
+		
+	if debug_mode:
+		print("Delete operation completed, deleted ", deleted_count, " voxels")
+		
 func _duplicate_selected():
+	if debug_mode:
+		print("_duplicate_selected called")
+		
 	if not selection or selection.selected_voxels.is_empty():
 		if ui:
 			ui.show_status("No voxels selected")
@@ -299,6 +384,9 @@ func _duplicate_selected():
 		if voxel_mesh.has_meta("voxel_key"):
 			var voxel_key = voxel_mesh.get_meta("voxel_key")
 			
+			if debug_mode:
+				print("Duplicating voxel: ", voxel_key)
+				
 			if current_voxel_data.has(voxel_key):
 				var original_voxel = current_voxel_data[voxel_key]
 				var original_pos = original_voxel["position"]
@@ -400,13 +488,19 @@ func _on_show_wireframe_toggled(enabled: bool):
 	if operations:
 		operations.set_wireframe(enabled)
 
-# Selection Event Handlers
+# Selection Event Handlers - FIXED
 func _on_voxel_selected(voxel_mesh):
+	if debug_mode:
+		print("Voxel selected: ", voxel_mesh.name if voxel_mesh else "Unknown")
+		
 	if ui and selection:
 		ui.update_selection_count(selection.selected_voxels.size())
 		ui.set_buttons_enabled(true)
 
 func _on_selection_cleared():
+	if debug_mode:
+		print("Selection cleared")
+		
 	if ui:
 		ui.update_selection_count(0)
 		ui.set_buttons_enabled(false)
@@ -435,7 +529,7 @@ func _on_voxel_placement_requested(position: Vector3i):
 	if operations:
 		operations.add_voxel(position)
 
-# File Event Handlers
+# File Event Handlers - FIXED
 func _on_model_loaded(voxel_data: Dictionary, model_path: String):
 	current_voxel_data = voxel_data
 	
@@ -477,8 +571,11 @@ func _on_state_restored(state: Dictionary):
 	if operations:
 		operations.recreate_voxels(current_voxel_data)
 	
-	# Set up selection for all voxels
+	# Set up selection for all voxels - FIXED
 	if voxel_container:
+		if debug_mode:
+			print("Setting up selection for restored voxels")
+			
 		for child in voxel_container.get_children():
 			if child is MeshInstance3D:
 				_setup_voxel_selection(child)

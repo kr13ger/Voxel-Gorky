@@ -9,6 +9,7 @@ signal voxels_moved(operation_data)
 
 var voxel_container: Node3D
 var editor: Node
+var debug_mode = true
 
 func setup_operations(container: Node3D, editor_ref: Node):
 	voxel_container = container
@@ -66,7 +67,11 @@ func create_voxel_mesh(key: String, voxel_data: Dictionary) -> MeshInstance3D:
 	
 	return mesh_instance
 
+# FIXED: Now properly connects input events for voxel selection
 func create_voxel_meshes(voxel_data: Dictionary):
+	if debug_mode:
+		print("Creating voxel meshes from data with ", voxel_data.size(), " voxels")
+		
 	# Clear existing voxels
 	for child in voxel_container.get_children():
 		child.queue_free()
@@ -76,14 +81,11 @@ func create_voxel_meshes(voxel_data: Dictionary):
 		var voxel_mesh = create_voxel_mesh(key, voxel_data[key])
 		voxel_container.add_child(voxel_mesh)
 		
-		# Connect input event handler
-		var area = voxel_mesh.get_node("SelectionArea")
-		if area:
-			# Disconnect any existing connections to avoid duplicates
-			if area.input_event.is_connected(editor._on_voxel_input_event):
-				area.input_event.disconnect(editor._on_voxel_input_event)
-			# Connect to the editor's voxel input handler
-			area.input_event.connect(editor._on_voxel_input_event.bind(voxel_mesh))
+		# FIX: Call the editor's setup_voxel_selection function to properly set up input events
+		if editor and editor.has_method("_setup_voxel_selection"):
+			editor.call("_setup_voxel_selection", voxel_mesh)
+			if debug_mode:
+				print("Set up selection for voxel: ", key)
 
 func recreate_voxels(voxel_data: Dictionary):
 	# Same as create_voxel_meshes, but with a different name for clarity in context
@@ -97,6 +99,9 @@ func add_voxel(position: Vector3i):
 		editor.ui.show_status("Cannot add voxel: Position already occupied")
 		return
 	
+	if debug_mode:
+		print("Adding voxel at position: ", position)
+		
 	# Create new voxel data
 	var new_voxel = {
 		"type": editor.current_material_type,
@@ -112,10 +117,9 @@ func add_voxel(position: Vector3i):
 	var new_mesh = create_voxel_mesh(key, new_voxel)
 	voxel_container.add_child(new_mesh)
 	
-	# Connect input event handler
-	var area = new_mesh.get_node("SelectionArea")
-	if area:
-		area.input_event.connect(editor._on_voxel_input_event.bind(new_mesh))
+	# FIX: Set up selection for the new voxel
+	if editor and editor.has_method("_setup_voxel_selection"):
+		editor.call("_setup_voxel_selection", new_mesh)
 	
 	# Emit signal for history
 	voxel_added.emit({"type": "add", "key": key, "data": new_voxel})
@@ -145,7 +149,7 @@ func apply_to_selected():
 			# Add emission for selected effect
 			mat.emission_enabled = true
 			mat.emission = Color(0.3, 0.3, 0.3)
-			mat.emission_energy = 0.5
+			mat.emission_energy_multiplier = 0.5
 			
 			if editor.current_material_type == "glass":
 				mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -230,10 +234,9 @@ func duplicate_selected():
 				var new_mesh = create_voxel_mesh(new_key, new_voxel)
 				voxel_container.add_child(new_mesh)
 				
-				# Connect input event handler
-				var area = new_mesh.get_node("SelectionArea")
-				if area:
-					area.input_event.connect(editor._on_voxel_input_event.bind(new_mesh))
+				# FIX: Set up selection for the new voxel
+				if editor and editor.has_method("_setup_voxel_selection"):
+					editor.call("_setup_voxel_selection", new_mesh)
 				
 				new_voxels.append(new_mesh)
 	
@@ -245,7 +248,11 @@ func duplicate_selected():
 	editor.ui.show_status("Duplicated " + str(new_voxels.size()) + " voxels")
 	voxel_added.emit({"type": "duplicate", "count": new_voxels.size()})
 
+# FIXED: Improved move_voxels implementation
 func move_voxels(move_data: Dictionary):
+	if debug_mode:
+		print("Moving voxels with offset: ", move_data.offset if move_data.has("offset") else "Unknown")
+		
 	var moved_keys = []
 	var original_positions = {}
 	var new_positions = {}
@@ -276,6 +283,8 @@ func move_voxels(move_data: Dictionary):
 			
 			# Skip if destination already has a voxel (that we're not moving)
 			if new_voxel_data.has(new_key) and not moved_keys.has(new_key):
+				if debug_mode:
+					print("Destination already has a voxel: ", new_key)
 				continue
 			
 			# Update position
@@ -285,6 +294,9 @@ func move_voxels(move_data: Dictionary):
 			new_voxel_data.erase(old_key)
 			new_voxel_data[new_key] = voxel_data
 			
+			if debug_mode:
+				print("Moving voxel from ", old_key, " to ", new_key)
+				
 			# Update the mesh reference
 			for voxel_mesh in editor.selection.selected_voxels:
 				if voxel_mesh.has_meta("voxel_key") and voxel_mesh.get_meta("voxel_key") == old_key:
