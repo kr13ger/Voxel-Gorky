@@ -1,4 +1,5 @@
 # scripts/tools/VoxelEditor.gd
+@tool
 extends Node3D
 
 # References to sub-components

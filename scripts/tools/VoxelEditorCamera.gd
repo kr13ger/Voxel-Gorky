@@ -12,7 +12,8 @@ var orbit_center = Vector3.ZERO
 
 func setup_camera(camera: Camera3D):
 	camera_node = camera
-	update_camera_position()
+	# Defer the position update to next frame when the node will be in the tree
+	call_deferred("update_camera_position")
 
 func _input(event):
 	# Handle camera controls
@@ -38,6 +39,9 @@ func _input(event):
 			update_camera_position()
 
 func update_camera_position():
+	if not camera_node or not camera_node.is_inside_tree():
+		return
+		
 	var x = cos(orbit_angle) * camera_distance
 	var z = sin(orbit_angle) * camera_distance
 	camera_node.position = Vector3(x, camera_height, z) + orbit_center
