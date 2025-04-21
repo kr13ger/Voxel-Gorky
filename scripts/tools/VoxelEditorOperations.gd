@@ -47,7 +47,7 @@ func create_voxel_mesh(key: String, voxel_data: Dictionary) -> MeshInstance3D:
 	mesh_instance.material_override = material
 	mesh_instance.set_meta("voxel_key", key)
 	
-	# Make it selectable with input
+	# Add a selection area to make it selectable
 	var area = Area3D.new()
 	area.name = "SelectionArea"
 	
@@ -59,37 +59,45 @@ func create_voxel_mesh(key: String, voxel_data: Dictionary) -> MeshInstance3D:
 	area.add_child(collision_shape)
 	mesh_instance.add_child(area)
 	
-	area.input_event.connect(_on_voxel_input_event.bind(mesh_instance))
+	# Configure input detection
+	area.input_ray_pickable = true
+	area.monitoring = true
+	area.monitorable = true
 	
 	return mesh_instance
 
-func _on_voxel_input_event(camera, event, clicked_pos, normal, shape_idx, voxel_mesh):
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			editor.selection.select_voxel(voxel_mesh)
-
 func create_voxel_meshes(voxel_data: Dictionary):
+	# Clear existing voxels
 	for child in voxel_container.get_children():
 		child.queue_free()
 	
+	# Create new voxel meshes for each voxel in the data
 	for key in voxel_data:
 		var voxel_mesh = create_voxel_mesh(key, voxel_data[key])
 		voxel_container.add_child(voxel_mesh)
+		
+		# Connect input event handler
+		var area = voxel_mesh.get_node("SelectionArea")
+		if area:
+			# Disconnect any existing connections to avoid duplicates
+			if area.input_event.is_connected(editor._on_voxel_input_event):
+				area.input_event.disconnect(editor._on_voxel_input_event)
+			# Connect to the editor's voxel input handler
+			area.input_event.connect(editor._on_voxel_input_event.bind(voxel_mesh))
 
 func recreate_voxels(voxel_data: Dictionary):
-	for child in voxel_container.get_children():
-		child.queue_free()
-	
-	for key in voxel_data:
-		var voxel_mesh = create_voxel_mesh(key, voxel_data[key])
-		voxel_container.add_child(voxel_mesh)
+	# Same as create_voxel_meshes, but with a different name for clarity in context
+	create_voxel_meshes(voxel_data)
 
 func add_voxel(position: Vector3i):
 	var key = "%d,%d,%d" % [position.x, position.y, position.z]
 	
+	# Check if voxel already exists at this position
 	if editor.current_voxel_data.has(key):
+		editor.ui.show_status("Cannot add voxel: Position already occupied")
 		return
 	
+	# Create new voxel data
 	var new_voxel = {
 		"type": editor.current_material_type,
 		"position": position,
@@ -97,33 +105,27 @@ func add_voxel(position: Vector3i):
 		"instance": null
 	}
 	
+	# Add to data dictionary
 	editor.current_voxel_data[key] = new_voxel
 	
+	# Create visual representation
 	var new_mesh = create_voxel_mesh(key, new_voxel)
 	voxel_container.add_child(new_mesh)
 	
+	# Connect input event handler
+	var area = new_mesh.get_node("SelectionArea")
+	if area:
+		area.input_event.connect(editor._on_voxel_input_event.bind(new_mesh))
+	
+	# Emit signal for history
 	voxel_added.emit({"type": "add", "key": key, "data": new_voxel})
-
-func delete_selected():
-	if editor.selection.selected_voxels.is_empty():
-		return
-	
-	var deleted_keys = []
-	
-	for voxel_mesh in editor.selection.selected_voxels:
-		var voxel_key = voxel_mesh.get_meta("voxel_key")
-		deleted_keys.append(voxel_key)
-		
-		if editor.current_voxel_data.has(voxel_key):
-			editor.current_voxel_data.erase(voxel_key)
-		
-		voxel_mesh.queue_free()
-	
-	editor.selection.clear_selection()
-	voxel_deleted.emit({"type": "delete", "keys": deleted_keys})
+	editor.ui.show_status("Added new voxel at " + key)
 
 func apply_to_selected():
+	# This is implemented by the editor to correctly apply changes
+	# The default operation here serves as a fallback
 	if editor.selection.selected_voxels.is_empty():
+		editor.ui.show_status("No voxels selected")
 		return
 	
 	var modified_keys = []
@@ -132,103 +134,178 @@ func apply_to_selected():
 		var voxel_key = voxel_mesh.get_meta("voxel_key")
 		modified_keys.append(voxel_key)
 		
+		# Apply material type and color
 		if editor.current_voxel_data.has(voxel_key):
 			editor.current_voxel_data[voxel_key]["type"] = editor.current_material_type
 			
-			var mat = voxel_mesh.material_override.duplicate()
+			# Update visual representation
+			var mat = StandardMaterial3D.new()
 			mat.albedo_color = editor.current_color
+			
+			# Add emission for selected effect
+			mat.emission_enabled = true
+			mat.emission = Color(0.3, 0.3, 0.3)
+			mat.emission_energy = 0.5
 			
 			if editor.current_material_type == "glass":
 				mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+				mat.albedo_color.a = 0.7
 			else:
 				mat.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
 			
 			voxel_mesh.material_override = mat
 	
 	voxel_modified.emit({"type": "modify", "keys": modified_keys})
+	editor.ui.show_status("Applied changes to " + str(modified_keys.size()) + " voxels")
 
-func move_voxels(move_data: Dictionary):
-	var moved_voxels = {}
-	var keys_to_remove = []
+func delete_selected():
+	# This is implemented by the editor to correctly handle selection updates
+	# The default operation here serves as a fallback
+	if editor.selection.selected_voxels.is_empty():
+		editor.ui.show_status("No voxels selected")
+		return
 	
-	for voxel_mesh in move_data.voxels:
-		var old_key = voxel_mesh.get_meta("voxel_key")
-		
-		if editor.current_voxel_data.has(old_key):
-			var voxel_data = editor.current_voxel_data[old_key]
-			var old_pos = voxel_data["position"]
-			var new_pos = old_pos + move_data.offset
-			var new_key = "%d,%d,%d" % [new_pos.x, new_pos.y, new_pos.z]
-			
-			# Skip if destination already has a voxel (that's not being moved)
-			if editor.current_voxel_data.has(new_key) and not (new_key in keys_to_remove):
-				continue
-			
-			# Create new voxel data
-			var new_voxel_data = voxel_data.duplicate()
-			new_voxel_data["position"] = new_pos
-			
-			moved_voxels[new_key] = new_voxel_data
-			keys_to_remove.append(old_key)
-			
-			# Update the mesh meta
-			voxel_mesh.set_meta("voxel_key", new_key)
+	var deleted_keys = []
+	var deleted_count = 0
 	
-	# Remove old voxels and add new ones
-	for key in keys_to_remove:
-		editor.current_voxel_data.erase(key)
+	# Create a copy of the array since we'll be modifying it
+	var selected_copy = editor.selection.selected_voxels.duplicate()
 	
-	for key in moved_voxels:
-		editor.current_voxel_data[key] = moved_voxels[key]
+	for voxel_mesh in selected_copy:
+		if voxel_mesh.has_meta("voxel_key"):
+			var voxel_key = voxel_mesh.get_meta("voxel_key")
+			deleted_keys.append(voxel_key)
+			
+			if editor.current_voxel_data.has(voxel_key):
+				editor.current_voxel_data.erase(voxel_key)
+				deleted_count += 1
+			
+			# Remove from selection first
+			editor.selection.selected_voxels.erase(voxel_mesh)
+			
+			# Delete the mesh
+			voxel_mesh.queue_free()
 	
-	voxels_moved.emit({"type": "move", "old_keys": keys_to_remove, "new_keys": moved_voxels.keys()})
+	voxel_deleted.emit({"type": "delete", "keys": deleted_keys})
+	editor.ui.update_selection_count(editor.selection.selected_voxels.size())
+	editor.ui.show_status("Deleted " + str(deleted_count) + " voxels")
 
 func duplicate_selected():
+	# This is implemented by the editor to correctly handle selection
+	# The default operation here serves as a fallback
 	if editor.selection.selected_voxels.is_empty():
+		editor.ui.show_status("No voxels selected")
 		return
 	
 	var new_voxels = []
-	var offset = Vector3i(1, 0, 0)
+	var offset = Vector3i(1, 0, 0)  # Offset in x direction
 	
 	for voxel_mesh in editor.selection.selected_voxels:
-		var voxel_key = voxel_mesh.get_meta("voxel_key")
-		
-		if editor.current_voxel_data.has(voxel_key):
-			var original_voxel = editor.current_voxel_data[voxel_key]
-			var original_pos = original_voxel["position"]
+		if voxel_mesh.has_meta("voxel_key"):
+			var voxel_key = voxel_mesh.get_meta("voxel_key")
 			
-			var new_pos = Vector3i(original_pos.x, original_pos.y, original_pos.z) + offset
-			var new_key = "%d,%d,%d" % [new_pos.x, new_pos.y, new_pos.z]
-			
-			if editor.current_voxel_data.has(new_key):
-				continue
-			
-			var new_voxel = {
-				"type": original_voxel["type"],
-				"position": new_pos,
-				"health": original_voxel["health"],
-				"instance": null
-			}
-			
-			editor.current_voxel_data[new_key] = new_voxel
-			
-			var new_mesh = create_voxel_mesh(new_key, new_voxel)
-			voxel_container.add_child(new_mesh)
-			new_voxels.append(new_mesh)
+			if editor.current_voxel_data.has(voxel_key):
+				var original_voxel = editor.current_voxel_data[voxel_key]
+				var original_pos = original_voxel["position"]
+				
+				var new_pos = Vector3i(original_pos.x, original_pos.y, original_pos.z) + offset
+				var new_key = "%d,%d,%d" % [new_pos.x, new_pos.y, new_pos.z]
+				
+				# Skip if destination already has a voxel
+				if editor.current_voxel_data.has(new_key):
+					continue
+				
+				# Create new voxel data
+				var new_voxel = {
+					"type": original_voxel["type"],
+					"position": new_pos,
+					"health": original_voxel.get("health", 50.0),
+					"instance": null
+				}
+				
+				# Add to data
+				editor.current_voxel_data[new_key] = new_voxel
+				
+				# Create visual representation
+				var new_mesh = create_voxel_mesh(new_key, new_voxel)
+				voxel_container.add_child(new_mesh)
+				
+				# Connect input event handler
+				var area = new_mesh.get_node("SelectionArea")
+				if area:
+					area.input_event.connect(editor._on_voxel_input_event.bind(new_mesh))
+				
+				new_voxels.append(new_mesh)
 	
+	# Clear selection and select only the new voxels
 	editor.selection.clear_selection()
-	
 	for voxel in new_voxels:
 		editor.selection.select_voxel(voxel)
+	
+	editor.ui.show_status("Duplicated " + str(new_voxels.size()) + " voxels")
+	voxel_added.emit({"type": "duplicate", "count": new_voxels.size()})
+
+func move_voxels(move_data: Dictionary):
+	var moved_keys = []
+	var original_positions = {}
+	var new_positions = {}
+	
+	# Store the original voxel data before moving
+	for voxel_mesh in move_data.voxels:
+		if voxel_mesh.has_meta("voxel_key"):
+			var old_key = voxel_mesh.get_meta("voxel_key")
+			
+			if editor.current_voxel_data.has(old_key):
+				var voxel_data = editor.current_voxel_data[old_key]
+				var old_pos = voxel_data["position"]
+				var new_pos = Vector3i(old_pos.x, old_pos.y, old_pos.z) + move_data.offset
+				
+				moved_keys.append(old_key)
+				original_positions[old_key] = old_pos
+				new_positions[old_key] = new_pos
+	
+	# Apply the moves
+	var new_voxel_data = editor.current_voxel_data.duplicate()
+	
+	# Remove the old keys and add with new positions
+	for old_key in moved_keys:
+		if new_voxel_data.has(old_key):
+			var voxel_data = new_voxel_data[old_key].duplicate()
+			var new_pos = new_positions[old_key]
+			var new_key = "%d,%d,%d" % [new_pos.x, new_pos.y, new_pos.z]
+			
+			# Skip if destination already has a voxel (that we're not moving)
+			if new_voxel_data.has(new_key) and not moved_keys.has(new_key):
+				continue
+			
+			# Update position
+			voxel_data["position"] = new_pos
+			
+			# Remove the old voxel and add the new one
+			new_voxel_data.erase(old_key)
+			new_voxel_data[new_key] = voxel_data
+			
+			# Update the mesh reference
+			for voxel_mesh in editor.selection.selected_voxels:
+				if voxel_mesh.has_meta("voxel_key") and voxel_mesh.get_meta("voxel_key") == old_key:
+					voxel_mesh.set_meta("voxel_key", new_key)
+					voxel_mesh.position = Vector3(new_pos.x * editor.voxel_size, new_pos.y * editor.voxel_size, new_pos.z * editor.voxel_size)
+	
+	# Update the editor's data
+	editor.current_voxel_data = new_voxel_data
+	
+	# Emit moved signal for history
+	voxels_moved.emit({"type": "move", "keys": moved_keys, "original_positions": original_positions, "new_positions": new_positions})
+	editor.ui.show_status("Moved " + str(moved_keys.size()) + " voxels")
 
 func set_wireframe(enabled: bool):
 	for voxel in voxel_container.get_children():
-		if voxel is MeshInstance3D:
-			var mat = voxel.material_override
-			if mat:
-				mat = mat.duplicate()
-				mat.wireframe = enabled
-				voxel.material_override = mat
+		if voxel is MeshInstance3D and voxel.material_override:
+			var mat = voxel.material_override.duplicate()
+			mat.wireframe = enabled
+			voxel.material_override = mat
+	
+	editor.ui.show_status("Wireframe mode " + ("enabled" if enabled else "disabled"))
 
 func get_voxel_health(voxel_type: String) -> float:
 	match voxel_type:
