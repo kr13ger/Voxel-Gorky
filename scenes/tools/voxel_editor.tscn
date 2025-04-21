@@ -171,7 +171,7 @@ text = "Material Type:"
 [node name="MaterialType" type="OptionButton" parent="UI/PropertyPanel/VBoxContainer"]
 layout_mode = 2
 selected = 0
-item_count = 25
+item_count = 30
 popup/item_0/text = "Metal"
 popup/item_0/id = 0
 popup/item_1/text = "Armor"
@@ -222,6 +222,16 @@ popup/item_23/text = "Glass"
 popup/item_23/id = 23
 popup/item_24/text = "Engine"
 popup/item_24/id = 24
+popup/item_25/text = "Metal"
+popup/item_25/id = 25
+popup/item_26/text = "Armor"
+popup/item_26/id = 26
+popup/item_27/text = "Turret"
+popup/item_27/id = 27
+popup/item_28/text = "Glass"
+popup/item_28/id = 28
+popup/item_29/text = "Engine"
+popup/item_29/id = 29
 
 [node name="HSeparator2" type="HSeparator" parent="UI/PropertyPanel/VBoxContainer"]
 layout_mode = 2
